@@ -18,8 +18,8 @@ from authenticate import (
 )
 from mailinteraction import bp_register, bp_request_new_user
 from blueprints import (
-    bp_home, bp_profile, bp_maps, bp_prices, 
-    bp_calendar, bp_terms, bp_adminDB
+    bp_home, bp_profile, 
+    bp_calendar, bp_adminDB
 )
 
 
@@ -58,10 +58,7 @@ def create_app(config_name=None):
     app.register_blueprint(bp_signup)
     app.register_blueprint(bp_register)
     app.register_blueprint(bp_request_new_user)
-    app.register_blueprint(bp_maps)
-    app.register_blueprint(bp_prices)
     app.register_blueprint(bp_calendar)
-    app.register_blueprint(bp_terms)
     app.register_blueprint(bp_adminDB)
     app.register_blueprint(bp_updateDB)
     
