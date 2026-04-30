@@ -1,15 +1,12 @@
 /* css/style.css */
-@layer base, layout, components, utilities, themes, quiz;
+@layer base, layout, components, utilities, themes;
 
-/* Importes por camadas (ordem controlada) */
+/* Imports ordered by layer */
 @import url("./base.css") layer(base);
 @import url("./layout.css") layer(layout);
 @import url("./components.css") layer(components);
 @import url("./utilities.css") layer(utilities);
 
-/* Temas por último para sobrescrever onde necessário */
+/* Themes last to allow overrides */
 @import url("./themes/light.css") layer(themes);
 @import url("./themes/dark.css") layer(themes);
-
-/* Específicos do quiz */
-@import url("./quiz.css") layer(quiz);

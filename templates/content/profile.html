@@ -1,63 +1,16 @@
 <div class="profile-container">
     <!-- Top welcome block -->
     <div class="welcome-block">
-        <h1>{{greeting}} {{full_name}} ({{email}})</h1>
-        <h2>A última vez que entrou foi {{lastlogin}}</h2>
+        <h1>Hello {{full_name}}!</h1>
+        {% if ign %}
+            <h3>IGN: <code>{{ ign }}</code></h3>
+        {% endif %}
+        <h2>Your last login was at {{lastlogin}}</h2>
     </div>
 
     <br>
 
-    <!-- Tier-specific sections -->
-    <div class="tier-section">
-        <!-- TIER 1 ONLY: Upgrade Button -->
-        {% if tier == 1 %}
-        <!-- TIER 1 ONLY: (Button removed as requested) -->
-
-        <!-- TIER 2 ONLY: Full Personal Info Section -->
-        {% elif tier == 2 %}
-        <div class="personal-info-section">
-            <h3>Informação Pessoal</h3>
-            <div class="info-grid">
-                <div class="info-item">
-                    <label>Morada:</label>
-                    <p>{{ morada }}</p>
-                </div>
-                <div class="info-item">
-                    <label>Código Postal:</label>
-                    <p>{{ codigopostal }}</p>
-                </div>
-                <div class="info-item">
-                    <label>NIF:</label>
-                    <p>{{ nif }}</p>
-                </div>
-                <div class="info-item">
-                    <label>Telemóvel:</label>
-                    <p>{{ telemovel }}</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="status-section">
-            <h3>Estado da Conta</h3>
-            <div class="status-grid">
-                <div class="status-item">
-                    <span class="status-badge" style="background-color: #{{ vpn_check_color }};">
-                        Verificação VPN: ✓
-                    </span>
-                </div>
-                <div class="status-item">
-                    <span class="status-badge" style="background-color: #{{ primeiro_contacto_color }};">
-                        Primeiro Contacto: Pendente
-                    </span>
-                </div>
-                <div class="status-item">
-                    <span class="status-badge" style="background-color: #{{ primeira_aula_color }};">
-                        Primeira Aula: Pendente
-                    </span>
-                </div>
-            </div>
-        </div>
-        {% endif %}
+    <div class="info-section">
+        <p>Welcome to your <strong>Mostly Jovial Crafters</strong> profile. Here you can manage your account and access server-related features.</p>
     </div>
-
 </div>

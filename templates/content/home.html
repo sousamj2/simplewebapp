@@ -1,14 +1,36 @@
-<h2> Bem-vindo ao meu site de explicações.</h2>
-<br>
+<div class="hero-section" style="text-align: center; margin-bottom: 2rem;">
+    <img src="{{ url_for('static', filename='images/mjcrafts_banner.png') }}" alt="Mostly Jovial Crafters Banner" style="max-width: 100%; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+</div>
 
-<p>Comecei este projecto no início do ano lectivo 2025/2026 para aplicar os conhecimentos em Amazon Web Services.</p>
-<br>
+<div class="server-status-box" style="text-align: center; padding: 2rem; background: var(--bg-card); border-radius: 8px; margin-bottom: 2rem; box-shadow: 0 4px 6px var(--shadow-sm);">
+    <h2>Server Status</h2>
+    {% if metadata and metadata.mc_status %}
+        {% if metadata.mc_status.online %}
+            <p style="color: var(--success-color, #28a745); font-weight: bold; font-size: 1.2rem;">ONLINE</p>
+            <p>Players Online: {{ metadata.mc_status.players_online }} / {{ metadata.mc_status.players_max }}</p>
+            {% if metadata.mc_status.motd %}
+                <p><i>{{ metadata.mc_status.motd }}</i></p>
+            {% endif %}
+            <p><small>Ping: {{ metadata.mc_status.latency }}ms</small></p>
+        {% else %}
+            <p style="color: var(--error-color, #dc3545); font-weight: bold; font-size: 1.2rem;">OFFLINE</p>
+            
+            {% if not user %}
+                <p>The server is currently offline. Please <a href="{{ url_for('signin.signin') }}">sign in</a> to restart the server.</p>
+            {% else %}
+                <p>The server is currently offline.</p>
+                <form action="/server/resume" method="POST">
+                    <button type="submit" class="btn btn--primary" style="margin-top: 1rem;">Start Server</button>
+                </form>
+            {% endif %}
+        {% endif %}
+    {% else %}
+        <p>Checking server status...</p>
+    {% endif %}
+</div>
 
-<p>A ideia inicial seria criar uma aplicação web para poder dar explicações ao domicílio no concelho de Lisboa.</p>
-<br>
-
-<p>Dado que a matemática é uma disciplina assente sempre em matéria anterior, um aluno nunca irá perceber corretamente a matéria corrente se não tiver uma boa base anterior: como queres perceber uma multiplicação se não sabes somar? Assim nessa aplicação, teria também a ideia de criar problemas para que os estudantes pudessem praticar não só a matéria do ano em que estão mas também aquela que ficou para trás.</p>
-<br>
-<p>Comecei a preparar alguns exercícios mas com a ajuda do Victor Nunes do matematica.pt, tive acesso a centenas de exercícios de cada ano a partir do 5º ano. Seleciona o questionário do menu à esquerda e podes começar a testar os teus conhecimentos. Estão neste momento apenas disponíveis exercícios do 5º ao 7º ano, mas mais estão já a caminho.</p>
-<br>
-<p>Todos os exercícios são de escolha simples ou escolha múltipla. Alguns estão resolvidos no site matematica.pt pelo Victor.</p>
+<div class="info-section">
+    <h3>Welcome to Mostly Jovial Crafters!</h3>
+    <p>Our Minecraft server focuses on community and creating a fun experience for everyone.</p>
+    <p>To start playing, please read our <a href="{{ url_for('rules.view_func_rules') }}">rules</a> and join us at <strong>mc.mjcrafts.pt</strong>.</p>
+</div>

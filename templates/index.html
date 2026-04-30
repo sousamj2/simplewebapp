@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="en-GB">
 
 <head>
     <meta charset="UTF-8">
@@ -64,18 +64,22 @@
                 </ul>
             </nav>
             <main class="main-content">
-                {{ main_content | safe }}
+                {% if content_template %}
+                    {% include content_template %}
+                {% else %}
+                    {{ main_content | safe }}
+                {% endif %}
             </main>
         </div>
     </div>
     <footer>
-    <p>  EXPLICACOESLISBOA.PT &copy; 2025 - Mário Sousa</p>
+    <p>MJCRAFTS.PT &copy; 2025 - Mário Sousa</p>
     </footer>
 
     <div class="theme-switcher">
-        <button class="theme-btn" data-theme="light" data-icon="☀️" title="Modo Claro"></button>
-        <button class="theme-btn" data-theme="dark" data-icon="🌙" title="Modo Escuro"></button>
-        <button class="theme-btn active" data-theme="system" data-icon="💻" title="Sistema"></button>
+        <button class="theme-btn" data-theme="light" data-icon="☀️" title="Light Mode"></button>
+        <button class="theme-btn" data-theme="dark" data-icon="🌙" title="Dark Mode"></button>
+        <button class="theme-btn active" data-theme="system" data-icon="💻" title="System"></button>
     </div>
 
     <script>
