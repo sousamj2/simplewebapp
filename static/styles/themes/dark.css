@@ -1,0 +1,26 @@
+@media (prefers-color-scheme: dark) {
+    body { background-color: #152238; color: #fff; }
+  
+    .title-box { background: var(--blue-title); color: #fff; }
+  
+    .menu { background: #233357; color: #fff; }
+    .menu li:hover { background: #314575; }
+    .menu a { color: #ffd600; }
+    .menu a:hover { background-color: #314575; color: #fff; }
+  
+    .main-content { background: #233357; color: #fff; }
+    .main-content h2 { color: var(--yellow-header); }
+    .title-box h1 { color: #fff; }
+  
+    .google-btn {
+      background-color: #000; border: 1px solid #444; color: #fff; box-shadow: none;
+    }
+    .google-btn:hover { box-shadow: 0 0 6px rgb(255 255 255 / 0.6); }
+  
+    .error {
+      color: #fbbf24;
+      background-color: rgba(251,191,36,0.15);
+      border: 1px solid rgba(251,191,36,0.3);
+    }
+  }
+  

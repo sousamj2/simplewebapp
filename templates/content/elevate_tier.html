@@ -1,0 +1,64 @@
+<div class="elevate-tier-container">
+    <h2>Pedir explicações em Lisboa</h2>
+    
+    {% if session.get('metadata', {}).get('error_message') %}
+    <div class="alert alert-danger">
+        {{ session['metadata']['error_message'] | replace('\n', '<br>') }}
+    </div>
+    <br>
+    {% endif %}
+
+
+    
+
+
+    <form method="POST" class="form-elevate-tier">
+    Morada fiscal<span class="required">*</span>: <input name="address" size="32" value="{{address}}" required><br>
+    Número: <input name="number" id="number" size="4" value="{{number}}" placeholder="NA">
+    Andar: <input name="floor" id="floor" size="3" value="{{floor}}" placeholder="NA">
+    Porta: <input name="door" id="door" size="2" value="{{door}}" placeholder="NA"><br>
+    Código Postal<span class="required">*</span>: <input 
+    name="zip_code1"
+    id="zip_code1"
+    placeholder="0000"
+    min="1100"
+    max="2999"
+    step="1"
+    size="5"
+    value="{{zip_code1}}" 
+    required>-<input
+    name="zip_code2"
+    id="zip_code2"
+    placeholder="000"
+    min="000"
+    max="999"
+    size="4"
+    value="{{zip_code2}}" 
+    required><br>
+    Telemóvel<span class="required">*</span>: <input
+      name="cell_phone"
+      id="cell_phone"
+      placeholder="900000000"
+      min="210000000" 
+      max="999999999"
+      step="1"
+      size="10"
+      value="{{cell_phone}}" 
+      pattern="\d{9}"
+      required><br>
+    Número Fiscal<span class="required">*</span>: <input name="nfiscal"
+    id="nfiscal"
+    size="10"
+    placeholder="200000000"
+    value="{{nfiscal}}" 
+    required><br><br>
+  </div>
+
+
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn--primary btn--lg">Confirmar Tier 2</button>
+            <a href="{{ url_for('profile.profile') }}" class="btn btn--secondary btn--lg">Cancelar</a>
+        </div>
+    </form>
+</div>

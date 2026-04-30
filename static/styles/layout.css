@@ -1,0 +1,28 @@
+.columns {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+    margin: 16px;
+  }
+  
+  /* Menu (coluna esquerda) */
+  .menu {
+    width: var(--menu-width);
+    background: #fff;
+    border-radius: var(--round);
+    box-shadow: 0 2px 6px rgba(60,60,60,0.09);
+    padding: 32px 12px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Main content (coluna direita) */
+  .main-content {
+    width: var(--main-width);
+    background: #fff;
+    border-radius: var(--round);
+    box-shadow: 0 2px 6px rgba(60,60,60,0.09);
+    padding: 40px 24px;
+  }
+  .main-content h2 { color: #2563eb; margin-top: 0; }
+  

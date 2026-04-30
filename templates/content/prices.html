@@ -1,0 +1,90 @@
+<style>
+    .prices-container {
+      display: flex;
+      justify-content: space-between;
+    }
+    .prices-table {
+      width: 48%;
+      border-collapse: collapse;
+    }
+    .prices-table, .prices-table th, .prices-table td {
+      border: 1px solid #000;
+    }
+    .prices-table th, .prices-table td {
+      padding: 8px;
+      text-align: center;
+    }
+    .divider {
+      border-left: 2px solid #000;
+      margin: 0 10px;
+    }
+    del {
+      color: red;
+    }
+  </style>
+  
+  <div class="prices-container">
+    <!-- First table - 1 aluno -->
+    <table class="prices-table">
+      <thead>
+        <tr>
+          <th>Aula</th>
+          <th>Alunos</th>
+          <th>Zona</th>
+          <th>Preço / aluno / hora</th>
+          <th>Duração (horas)</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>1</td><td>Verde</td><td>18€</td><td>1.5</td><td>27€</td></tr>
+        <tr><td>1</td><td>1</td><td>Amarela</td><td>24€</td><td>1.5</td><td>36€</td></tr>
+        <tr><td>1</td><td>1</td><td>Laranja</td><td>30€</td><td>1.5</td><td>45€</td></tr>
+        <tr><td>6</td><td>1</td><td>Verde</td><td>18€</td><td>1.5</td>
+          <td><del>162€</del> <br>145.8€</td>
+        </tr>
+        <tr><td>6</td><td>1</td><td>Amarela</td><td>24€</td><td>1.5</td>
+          <td><del>216€</del> <br>194.4€</td>
+        </tr>
+        <tr><td>6</td><td>1</td><td>Laranja</td><td>30€</td><td>1.5</td>
+          <td><del>270€</del> <br>243€</td>
+        </tr>
+      </tbody>
+    </table>
+  
+    <div class="divider"></div>
+  
+    <!-- Second table - 2 alunos -->
+    <table class="prices-table">
+      <thead>
+        <tr>
+          <th>Aula</th>
+          <th>Alunos</th>
+          <th>Zona</th>
+          <th>Preço / aluno / hora</th>
+          <th>Duração (horas)</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>2</td><td>Verde</td><td>12€</td><td>1.5</td><td>36€</td></tr>
+        <tr><td>1</td><td>2</td><td>Amarela</td><td>15€</td><td>1.5</td><td>45€</td></tr>
+        <tr><td>1</td><td>2</td><td>Laranja</td><td>18€</td><td>1.5</td><td>54€</td></tr>
+        <tr><td>6</td><td>2</td><td>Verde</td><td>12€</td><td>1.5</td>
+          <td><del>216€</del> <br>194.4€</td>
+        </tr>
+        <tr><td>6</td><td>2</td><td>Amarela</td><td>15€</td><td>1.5</td>
+          <td><del>270€</del> <br>243€</td>
+        </tr>
+        <tr><td>6</td><td>2</td><td>Laranja</td><td>18€</td><td>1.5</td>
+          <td><del>324€</del> <br>291.6€</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <br>
+  <h2>Notas:</h2>
+  <p>O preço do pack de 6 aulas tem um desconto de 50% na sexta aula.</p>
+  <p>A primeira aula é gratuíta.</p>
+  <p>Mais informações nos termos do serviço.</p>
+  

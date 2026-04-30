@@ -1,0 +1,7 @@
+<li><a href="{{ url_for('home.view_func_home') }}">Home</a></li>
+<li><a href="{{ url_for('profile.profile') }}">{{ session['metadata']['full_name'] }}</a></li>
+<li><a href="{{ url_for('maps.view_func_maps') }}">Mapa</a></li>
+<li><a href="{{ url_for('prices.view_func_prices') }}">Preçário</a></li>
+<li><a href="{{ url_for('terms.view_func_terms') }}">Termos do serviço</a></li>
+<li><a href="{{ url_for('quiz.quiz_config') }}">Questionário</a></li>
+<li><a href="{{ url_for('logout.logout') }}">Sair</a></li>

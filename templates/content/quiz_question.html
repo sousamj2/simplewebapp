@@ -1,0 +1,322 @@
+{# Macro to render option based on type and position #}
+{% macro render_option(option, type_of_answer, option_index) -%}
+  {% if option_index == 0 %}
+    {# Index 0 is always "Não sei" - always plain text #}
+    <span class="answer-text">{{ option }}</span>
+  {% elif type_of_answer == 'latex' %}
+    {# LaTeX math - wrap in \( ... \) for inline MathJax rendering #}
+    {# IMPORTANT: Don't double-escape! Let Jinja render the backslashes #}
+    <span class="answer-text mathjax-process">\( {{ option }} \)</span>
+  {% elif type_of_answer == 'image' %}
+    {# Image option - render as img tag #}
+    <img src="{{ option }}" alt="option image" class="answer-image" style="width:50%; height:auto;">
+  {% else %}
+    {# Plain text - no processing #}
+    <span class="answer-text">{{ option }}</span>
+  {% endif %}
+{%- endmacro %}
+
+<!-- Question breadcrumb/path - Fancy version -->
+<div class="question-header">
+    <div class="breadcrumb">
+        {% set parts = question.question_path.split('/') %}
+        {% for part in parts %}
+            <span class="breadcrumb-item">
+                {% if loop.index0 == 0 %}
+                    <span class="breadcrumb-icon">📚</span> {{ part }}º ano
+                {% elif loop.index0 == 1 %}
+                    <span class="breadcrumb-icon">🎯</span> {{ part }}
+                {% elif loop.index0 == 2 %}
+                    <span class="breadcrumb-icon">📖</span> {{ part }}
+                {% elif loop.index0 == 3 %}<br>
+                </span>
+                </div>
+                    Para dicas e outras perguntas sobre este tema podes consultar aqui:
+                    <a href="https://www.matematica.pt/aulas-exercicios.php?id={{ part }}" target="_blank">www.matematica.pt</a>
+                    
+                {% endif %}
+                {% endfor %}
+</div>
+        
+
+<!-- Navigation buttons -->
+<div class="quiz-navigation">
+    {% if question_num > 0 %}
+        <button type="button" class="btn btn-secondary" onclick="navigateQuiz('previous')">
+            ← Anterior
+        </button>
+    {% else %}
+        <div class="nav-spacer"></div>
+    {% endif %}
+
+    <div class="nav-spacer"></div>
+
+    {% if question_num < total_questions - 1 %}
+        <button type="button" class="btn btn-primary" onclick="navigateQuiz('next')">
+            Próxima →
+        </button>
+    {% else %}
+        <button type="button" class="btn btn-primary" onclick="navigateQuiz('finish')">
+            Finalizar Quiz
+        </button>
+    {% endif %}
+</div>
+
+<div class="quiz-container">
+    <!-- Progress bar -->
+    <div class="quiz-progress">
+        <div class="progress-info">
+            <span class="progress-text">Pergunta {{ question_num + 1 }} de {{ total_questions }}</span>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: {{ ((question_num + 1) / total_questions * 100) }}%"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Question image with overlays -->
+    <div class="stage-wrapper">
+        <div class="stage">
+            <img 
+                src="{{ question.image_url }}" 
+                alt="Quiz question image" 
+                class="quiz-image invert-on-dark"
+            >
+            
+        </div>
+    </div>
+    
+    {# Note block between image and answers #}
+    {% if question.note %}
+      {% set note_str = question.note|string %}
+      {% set is_img = note_str.endswith('.png') or note_str.endswith('.jpg') or note_str.endswith('.jpeg') or note_str.endswith('.gif') or note_str.endswith('.webp') %}
+      <div class="question-note-block">
+        {% if is_img %}
+          <img src="{{ note_str }}" alt="Nota" class="note-image invert-on-dark">
+          {% elif '<a ' in note_str and '</a>' in note_str %}
+            <div class="question-note-block">
+              {{ note_str | safe }}
+            </div>
+        {% else %}
+          <div class="note-text">{{ note_str }}</div>
+        {% endif %}
+      </div>
+    {% endif %}
+    
+    <!-- Answer options -->
+    <div class="answers">
+        <!-- Composed question instruction - if present -->
+        {% if question.composed_instruction %}
+        <div class="composed-instruction">
+            <strong>{{ question.composed_instruction }}</strong>
+        </div>
+        {% endif %}
+        <h3>Selecione a resposta:</h3>
+
+        <form id="quiz-form">
+            <input type="hidden" name="question_num" value="{{ question_num }}">
+
+            {% if question.is_multiple_choice %}
+                <!-- Multiple choice (checkboxes) -->
+                <div class="quiz-options mathjax-process">
+                    {% for option in question.options %}
+                        {% set i = loop.index0 %}
+                        {% set is_checked = (i|string in current_answer) %}
+                        {% set is_dont_know = (i == 0) %}
+                        
+                        <!-- Default: "Não sei" is checked if no current answer -->
+                        {% if is_dont_know and not current_answer %}
+                            {% set is_checked = true %}
+                        {% endif %}
+                        
+                        <label for="option-{{ i }}" class="option option-checkbox" data-option-index="{{ i }}" data-dont-know="{{ is_dont_know|lower }}">
+                            <input 
+                                type="checkbox" 
+                                name="answer" 
+                                value="{{ i }}" 
+                                id="option-{{ i }}"
+                                {% if is_checked %}checked{% endif %}
+                                data-dont-know="{{ is_dont_know|lower }}"
+                                class="answer-checkbox"
+                            >
+                            <!-- {{ render_option(option, question.type_of_answer) }} -->
+                            {{ render_option(option, question.type_of_answer, loop.index0) }}
+
+
+                        </label>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <!-- Single choice (radio buttons) -->
+                <div class="options-container">
+                    {% for option in question.options %}
+                        {% set i = loop.index0 %}
+                        {% set is_dont_know = (i == 0) %}
+                        {% set is_checked = (i|string in current_answer) if current_answer else is_dont_know %}
+                        
+                        <label for="option-{{ i }}" class="option option-radio" data-option-index="{{ i }}" data-dont-know="{{ is_dont_know|lower }}">
+                            <input 
+                                type="radio" 
+                                name="answer" 
+                                value="{{ i }}" 
+                                id="option-{{ i }}"
+                                {% if is_checked %}checked{% endif %}
+                                class="answer-radio"
+                            >
+                            {{ render_option(option, question.type_of_answer, i) }}
+                        </label>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </form>
+        
+        <!-- ===== SCRIPT 1: CHECKBOX LOGIC & SUBMISSION ===== -->
+        <script>
+        // "Não sei" checkbox logic
+        document.querySelectorAll('.answer-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const allCheckboxes = document.querySelectorAll('.answer-checkbox');
+                const dontKnowCheckbox = document.querySelector('input[value="0"][type="checkbox"]');
+                
+                if (!dontKnowCheckbox) return;
+                
+                if (this.value === '0' && this.checked) {
+                    allCheckboxes.forEach(cb => {
+                        if (cb.value !== '0') cb.checked = false;
+                    });
+                }
+                
+                if (this.value !== '0' && this.checked) {
+                    dontKnowCheckbox.checked = false;
+                }
+                
+                submitAnswerSilent();
+            });
+        });
+        
+        function submitAnswerSilent() {
+            const form = document.getElementById('quiz-form');
+            if (!form) return;
+            
+            fetch('/quiz/submit', {
+                method: 'POST',
+                body: new FormData(form)
+            })
+            .then(r => r.json())
+            .catch(e => console.error('Error:', e));
+        }
+        </script>
+
+
+<!-- ===== SCRIPT 1: CHECKBOX LOGIC & SUBMISSION ===== -->
+<script>
+// "Não sei" checkbox logic
+document.querySelectorAll('.answer-checkbox').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+        const allCheckboxes = document.querySelectorAll('.answer-checkbox');
+        const dontKnowCheckbox = document.querySelector('input[value="0"][type="checkbox"]');
+        
+        if (!dontKnowCheckbox) return;
+        
+        if (this.value === '0' && this.checked) {
+            allCheckboxes.forEach(cb => {
+                if (cb.value !== '0') cb.checked = false;
+            });
+        }
+        
+        if (this.value !== '0' && this.checked) {
+            dontKnowCheckbox.checked = false;
+        }
+        
+        submitAnswerSilent();
+    });
+});
+
+function submitAnswerSilent() {
+    const form = document.getElementById('quiz-form');
+    if (!form) return;
+    
+    fetch('/quiz/submit', {
+        method: 'POST',
+        body: new FormData(form)
+    })
+    .then(r => r.json())
+    .catch(e => console.error('Error:', e));
+}
+</script>
+
+    </div>
+
+    <!-- Navigation buttons -->
+    <div class="quiz-navigation">
+        {% if question_num > 0 %}
+            <button type="button" class="btn btn-secondary" onclick="navigateQuiz('previous')">
+                ← Anterior
+            </button>
+        {% else %}
+            <div class="nav-spacer"></div>
+        {% endif %}
+
+        <div class="nav-spacer"></div>
+
+        {% if question_num < total_questions - 1 %}
+            <button type="button" class="btn btn-primary" onclick="navigateQuiz('next')">
+                Próxima →
+            </button>
+        {% else %}
+            <button type="button" class="btn btn-primary" onclick="navigateQuiz('finish')">
+                Finalizar Quiz
+            </button>
+        {% endif %}
+    </div>
+    <br>
+    <p>Perguntas: MATEMATICA.PT &copy; 2025 - Vitor Nunes</p>
+    <p>Respostas: EXPLICACOESLISBOA.PT &copy; 2025 - Mário Sousa</p>
+
+</div>
+
+<script>
+// Submit answer silently when user changes selection
+document.querySelectorAll('.answer-checkbox, .answer-radio').forEach(input => {
+    input.addEventListener('change', function() {
+        submitAnswerSilent();
+    });
+});
+
+function submitAnswerSilent() {
+    const form = document.getElementById('quiz-form');
+    const formData = new FormData(form);
+    
+    fetch('/quiz/submit', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Answer saved:', data);
+    })
+    .catch(error => {
+        console.error('Error saving answer:', error);
+    });
+}
+
+function navigateQuiz(action) {
+    const questionNum = {{ question_num }};
+    const formData = new FormData();
+    formData.append('action', action);
+    formData.append('current_question', questionNum);
+    
+    fetch('/quiz/navigate', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.redirect) {
+            window.location.href = data.redirect;
+        }
+    })
+    .catch(error => {
+        console.error('Navigation error:', error);
+    });
+}
+</script>

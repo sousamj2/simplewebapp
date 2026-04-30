@@ -1,0 +1,112 @@
+<div class="profile-container">
+    <!-- Top welcome block -->
+    <div class="welcome-block">
+        <h1>{{greeting}} {{full_name}} ({{email}})</h1>
+        <h2>A última vez que entrou foi {{lastlogin}}</h2>
+    </div>
+
+    <br>
+
+    <!-- Tier-specific sections -->
+    <div class="tier-section">
+        <!-- TIER 1 ONLY: Upgrade Button -->
+        {% if tier == 1 %}
+        <div class="tier-upgrade-section">
+            <div class="info-box warning">
+                <a href="{{ url_for('elevate_tier.elevate_tier') }}" class="btn btn--primary">
+                    Pedir Explicações (só no concelho de Lisboa)
+                </a>
+            </div>
+        </div>
+
+        <!-- TIER 2 ONLY: Full Personal Info Section -->
+        {% elif tier == 2 %}
+        <div class="personal-info-section">
+            <h3>Informação Pessoal</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>Morada:</label>
+                    <p>{{ morada }}</p>
+                </div>
+                <div class="info-item">
+                    <label>Código Postal:</label>
+                    <p>{{ codigopostal }}</p>
+                </div>
+                <div class="info-item">
+                    <label>NIF:</label>
+                    <p>{{ nif }}</p>
+                </div>
+                <div class="info-item">
+                    <label>Telemóvel:</label>
+                    <p>{{ telemovel }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="status-section">
+            <h3>Estado da Conta</h3>
+            <div class="status-grid">
+                <div class="status-item">
+                    <span class="status-badge" style="background-color: #{{ vpn_check_color }};">
+                        Verificação VPN: ✓
+                    </span>
+                </div>
+                <div class="status-item">
+                    <span class="status-badge" style="background-color: #{{ primeiro_contacto_color }};">
+                        Primeiro Contacto: Pendente
+                    </span>
+                </div>
+                <div class="status-item">
+                    <span class="status-badge" style="background-color: #{{ primeira_aula_color }};">
+                        Primeira Aula: Pendente
+                    </span>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Quiz History Section -->
+    <div class="quiz-history-container" style="margin-top: 2rem;">
+        {% if quiz_history %}
+        <div class="quiz-history-section">
+            <h3>Histórico de Quizzes</h3>
+            <table class="styled-table" style="width: 100%; border-collapse: collapse; margin-bottom: 1rem; table-layout: fixed;">
+                <thead>
+                    <tr>
+                        <th style="width: 180px; text-align: right; padding: 8px; border: 1px solid #ddd; border-bottom: 2px solid #333;">Data</th>
+                        <th style="width: 60px; text-align: right; padding: 8px; border: 1px solid #ddd; border-bottom: 2px solid #333;">Pontuação</th>
+                        <th style="width: 60px; text-align: left; padding: 8px; border: 1px solid #ddd; border-bottom: 2px solid #333;">Resultados</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for quiz in quiz_history %}
+                    <tr>
+                        <td style="text-align: right; padding: 8px; border: 1px solid #ddd; font-family: 'Courier New', Courier, monospace;">{{ quiz.quiz_date | format_data }}</td>
+                        <td style="text-align: right; padding: 8px; border: 1px solid #ddd;">{{ "%.0f"|format(quiz.score_perc or 0.0) }}%</td>
+                        <td style="text-align: left; padding: 8px; border: 1px solid #ddd;"><a href="{{ url_for('quiz.view_quiz_result', quiz_uuid=quiz.q_uuid, source='profile') }}">{{ quiz.q_uuid[:8] }}...</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination Controls -->
+        <div class="pagination" style="margin-top: 1rem; text-align: left;">
+            {% if total_pages > 1 %}
+                <div class="pagination-links" style="display: inline-block; border: 1px solid #ddd; border-radius: 4px; overflow: hidden;">
+                    {% if page > 1 %}
+                        <a href="{{ url_for('profile.profile', page=page-1) }}" style="display: inline-block; padding: 8px 16px; text-decoration: none; color: #337ab7; border-right: 1px solid #ddd;">&laquo; Anterior</a>
+                    {% endif %}
+
+                    <span style="display: inline-block; padding: 8px 16px; background-color: #f2f2f2; color: #333;">Página {{ page }} de {{ total_pages }}</span>
+
+                    {% if page < total_pages %}
+                        <a href="{{ url_for('profile.profile', page=page+1) }}" style="display: inline-block; padding: 8px 16px; text-decoration: none; color: #337ab7; border-left: 1px solid #ddd;">Seguinte &raquo;</a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>

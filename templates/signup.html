@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page_title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
+</head>
+
+<body>
+    <div class="container">
+        <div class="title-box">
+            <h1>{{ title }}</h1>
+        </div>
+        <div class="columns">
+            <nav class="menu">
+                <ul>
+                    {% if user %}
+                    {% include 'content/menu-profile.html' %}
+                    {% else %}
+                    {% include 'content/menu.html' %}
+                    {% endif %}
+                </ul>
+            </nav>
+            <h1>Registo na base de dados</h1> <br> 
+
+            <form id="signupForm" action="{{ url_for('updateDB.update_db') }}" method="post" onsubmit="openGoogleCalendar()">
+
+            <!-- <form method="post"> -->
+                Morada fiscal: <input name="address" size="32" value="{{ address|default('') }}"><br>
+                Número: <input name="number" id="number" size="4" value="{{ number|default('') }}" placeholder="NA">
+                Andar: <input name="floor" id="floor" size="3" value="{{ floor|default('') }}" placeholder="NA">
+                Porta: <input name="door" id="door" size="2" value="{{ door|default('') }}" placeholder="NA"><br>
+                Código Postal: <input 
+                name="zip_code1"
+                id="zip_code1"
+                placeholder="0000"
+                min="1100"
+                max="2999"
+                step="1"
+                size="5"
+                required>-<input
+                name="zip_code2"
+                id="zip_code2"
+                placeholder="000"
+                min="000"
+                max="999"
+                size="4"
+                value="{{ zip_code1|default('') }}" 
+                required><br>
+                Telemóvel: <input
+                 name="cell_phone"
+                 id="cell_phone"
+                 placeholder="900000000"
+                 min="210000000" 
+                 max="999999999"
+                 step="1"
+                 size="10"
+                 pattern="\d{9}"
+                 value="{{ zip_code2|default('') }}" 
+                 required><br>
+                Número Fiscal: <input name="nfiscal"
+                id="nfiscal"
+                size="10"
+                placeholder="200000000"
+                value="{{ nfiscal|default('') }}" 
+                required><br><br>
+                <input type="submit" value="Submit">
+            </form>
+
+            {% if error_message %}
+            <div class="error">{{ error_message }}</div>
+            {% endif %}
+
+            <p> Template Nenhum dado será partilhado fora da aplicação. </p>
+<!-- 
+            <script>
+                function openGoogleCalendar() {
+                    window.open('http://localhost:8080/calendar', '_blank');
+                    return true; // Allow form submission to proceed
+                }
+            </script> -->
+
+
+            </main>
+        </div>
+    </div>
+</body>
+
+</html>

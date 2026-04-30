@@ -1,0 +1,52 @@
+<h2>Login com utilizador e palavra-passe</h2>
+<form method="POST" action="{{ url_for('check_user.check_user') }}">
+    <label for="username">Utilizador<span class="required">*</span>:</label> <br>
+    <input type="text" id="username" name="username" required> <br>
+    <label for="password">Palavra-passe<span class="required">*</span>:</label> <br>
+    <input type="password" id="password" name="password" required> <br>
+    <button type="submit">Entrar</button>
+</form>
+<form method="GET" action="{{ url_for('register.request_confirmation') }}" style="margin-top:1em;">
+    <button type="submit">Registar novo utilizador</button>
+</form>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+
+<hr>
+<h2>Este site utiliza autenticação feita por uma conta Google</h2>
+<p>Nota: Apenas utilizo o Google para autenticação. Não partilho
+    qualquer informação do utilizador.</p>
+
+<p>Apenas guardo o Nome e Email para criar a sua conta.</p>
+
+{# Old version: <a href="{{ url_for('signin_redirect') }}" class="google-btn" aria-label="Login com Google"> #}
+<a href="{{ url_for('signin_redirect.signin_redirect') }}" class="google-btn" aria-label="Login com Google">
+    <img class="google-logo" src="{{ logo_url }}" alt="Google logo" />
+    <h3><em>Iniciar sessão com Google</em></h3>
+</a>
+
+<br>
+<br>
+
+<h2>Não tem uma conta do Google?</h2>
+Se não tem uma conta do Google, pode criar uma gratuitamente.
+<br>
+    <a href="https://support.google.com/mail/answer/56256?hl=pt-BR2" target="_blank" rel="noopener noreferrer">
+        Clique aqui se precisa de ajuda para criar um conta do Google.</a>
+<br><br>
+<a href="https://support.google.com/accounts/answer/32050?hl=pt-BR" target="_blank" rel="noopener noreferrer">
+    Saiba mais sobre como o Google protege a sua privacidade</a>
+<br>
+<a href="https://policies.google.com/privacy?hl=pt-BR" target="_blank" rel="noopener noreferrer">
+    Política de Privacidade do Google</a>
+<br>
+<a href="https://policies.google.com/terms?hl=pt-BR" target="_blank" rel="noopener noreferrer">
+    Termos de Serviço do Google</a>
+<br>

@@ -1,0 +1,119 @@
+
+<h1>Registo na base de dados</h1> <br> 
+
+<form id="signupForm" action="{{ url_for('updateDB.updateDB') }}" method="post" onsubmit="openGoogleCalendar()">
+
+  
+  <!-- Top Row: Email -->
+  <div class="form-row">
+    <div class="form-col" style="flex: 2;">
+      <label for="email">Email</label><br />
+      <input type="email"  size="32" id="email" name="email" 
+        value="{{ email_input }}" readonly required />
+    </div>
+  </div>
+  
+  
+  <div class="form-grid_wrapper">
+    {% if not is_google %}
+    <!-- Left Column: Username/Password, only for registration token users -->
+      <div class="form-grid">
+        <div>
+          <label>Username<span class="required">*</span></label>
+          <input type="checkbox" id="use_email_as_username" checked onclick="toggleUsernameField()">
+          <label for="use_email_as_username">Use email as username</label>
+          <br>
+          <input type="text" id="username" name="username"  size="32" 
+                value="{{ email_input }}"
+                placeholder="{{ email_input }}"
+                readonly required><br>
+          <label>Password<span class="required">*</span></label><br>
+          <input type="password" id="password" name="password"  size="32" required
+                pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+                title="Minimum 8 characters, at least one uppercase, one lowercase, and a number.">
+          <br>
+          <label>Confirm Password<span class="required">*</span></label><br>
+          <input type="password" id="confirm_password" name="confirm_password"  size="32" required>
+        </div>
+    {% endif %}
+
+    <!-- Right Column: Additional Info (always shown) -->
+      <div>
+        <div class="form-row" style="gap: 1em;">
+          <div class="form-col">
+            <label for="given_name">First Name<span class="required">*</span></label><br>
+            {% if given_name %}
+              <input type="text" name="given_name" id="given_name" value="{{ given_name }}" readonly>
+            {% else %}
+              <input type="text" name="given_name" id="given_name" value="" required>
+            {% endif %}
+          </div>
+          <div class="form-col">
+            <label for="family_name">Last Name<span class="required">*</span></label><br>
+            {% if family_name %}
+              <input type="text" name="family_name" id="family_name" value="{{ family_name }}" readonly>
+            {% else %}
+              <input type="text" name="family_name" id="family_name" value="" required>
+            {% endif %}
+          </div>
+        </div>
+
+      </div>
+      <input type="submit" value="Submit">
+      <p> content Nenhum dado será partilhado fora da aplicação. </p>  
+  </div>
+
+  
+</form>
+
+
+<!-- Optional: JS for confirming password match -->
+<script>
+  document.getElementById('signup-form').addEventListener('submit', function (e) {
+    let pwd = document.getElementById('password');
+    let confirmPwd = document.getElementById('confirm_password');
+    if (pwd && confirmPwd && pwd.value !== confirmPwd.value) {
+      e.preventDefault();
+      alert('Passwords do not match');
+      confirmPwd.focus();
+    }
+  });
+</script>
+
+<script>
+function toggleUsernameField() {
+  const checkbox = document.getElementById('use_email_as_username');
+  const usernameInput = document.getElementById('username');
+  const emailValue = "{{ email_input }}";
+  if (checkbox.checked) {
+    usernameInput.value = emailValue;
+    usernameInput.readOnly = true;
+  } else {
+    usernameInput.value = "";
+    usernameInput.placeholder = emailValue;
+    usernameInput.readOnly = false;
+  }
+}
+</script>
+<script>
+
+const requiredFields = document.querySelectorAll('input[required], textarea[required], select[required]');
+
+requiredFields.forEach(field => {
+  field.addEventListener('invalid', function () {
+    if (field.validity.valueMissing) {
+      field.setCustomValidity('Este campo é obrigatório.');
+    } else {
+      field.setCustomValidity('');
+    }
+  });
+
+  field.addEventListener('input', function () {
+    field.setCustomValidity('');
+  });
+});
+</script>
+
+{% if error_message %}
+<div class="error">{{ error_message }}</div>
+{% endif %}

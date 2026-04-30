@@ -1,0 +1,59 @@
+/* Title box */
+.title-box {
+  background: var(--blue-title);
+  color: #fff;
+  border-radius: var(--round);
+  margin: 16px;
+  padding: 20px;
+  text-align: center;
+}
+
+/* Menu conteúdo */
+.menu ul { list-style: none; padding: 0; }
+.menu li {
+  padding: 10px 0;
+  font-size: 1.1em;
+  border-radius: var(--round);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.menu li:hover { background: #edf2fb; }
+
+.menu a {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: bold;
+  display: block;
+  padding: 10px 0;
+  border-radius: var(--round);
+}
+.menu a:hover { background-color: #edf2fb; color: #003d99; }
+
+/* Google button */
+.google-btn {
+  background-color: #fff;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px 0 rgb(0 0 0 / 0.25);
+  color: #3c4043;
+  font-weight: 500;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 16px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: box-shadow 0.3s;
+}
+.google-btn:hover { box-shadow: 0 0 6px rgb(66 133 244 / 0.6); }
+.google-logo { width: 18px; height: 18px; margin-right: 12px; }
+
+/* LED e erros */
+.led-bullet {
+  display: inline-block; width: 12px; height: 12px; border-radius: 50%;
+  margin-right: 8px; vertical-align: middle; background-color: orange;
+}
+.error {
+  padding: 10px; margin: 10px 0; border-radius: 4px; font-weight: 500;
+  color: #c0152f; background-color: rgba(255,84,89,.1); border: 1px solid rgba(192,21,47,.3);
+}

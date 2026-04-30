@@ -1,0 +1,6 @@
+@media (prefers-color-scheme: light) {
+    body { background-color: var(--egg-shell); color: #000; }
+    .title-box { background: var(--blue-title); color: #fff; }
+    .main-content h2 { color: #2563eb; }
+  }
+  
