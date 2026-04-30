@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ page_title }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/theme-switcher.css') }}">
 
     
     <!-- KaTeX for math rendering -->
@@ -71,6 +72,39 @@
     <p>  EXPLICACOESLISBOA.PT &copy; 2025 - Mário Sousa</p>
     </footer>
 
+    <div class="theme-switcher">
+        <button class="theme-btn" data-theme="light" data-icon="☀️" title="Modo Claro"></button>
+        <button class="theme-btn" data-theme="dark" data-icon="🌙" title="Modo Escuro"></button>
+        <button class="theme-btn active" data-theme="system" data-icon="💻" title="Sistema"></button>
+    </div>
+
+    <script>
+        const themeBtns = document.querySelectorAll('.theme-btn');
+        const root = document.documentElement;
+
+        // Apply theme on load
+        const savedTheme = localStorage.getItem('theme') || 'system';
+        applyTheme(savedTheme);
+
+        themeBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const theme = btn.getAttribute('data-theme');
+                applyTheme(theme);
+                localStorage.setItem('theme', theme);
+            });
+        });
+
+        function applyTheme(theme) {
+            themeBtns.forEach(b => b.classList.remove('active'));
+            document.querySelector(`.theme-btn[data-theme="${theme}"]`).classList.add('active');
+
+            if (theme === 'system') {
+                root.removeAttribute('data-theme');
+            } else {
+                root.setAttribute('data-theme', theme);
+            }
+        }
+    </script>
 </body>
 
 </html>

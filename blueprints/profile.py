@@ -65,7 +65,7 @@ def profile():
         # Get full profile from DB
         session["metadata"] = get_user_profile_tier1(email)
         # GET USER TIER FROM DATABASE - critical for conditional rendering
-        user_tier = session["metadata"].get("tier", 1)  # Default to tier 1
+        user_tier = int(session["metadata"].get("tier", 1))  # Ensure tier is an integer
         full_address = None
         zip_full = None
 
@@ -93,8 +93,8 @@ def profile():
             )
 
         session["metadata"]["full_name"] = (
-            session["metadata"]["first_name"] + " " + session["metadata"]["last_name"]
-        )
+            (session["metadata"].get("first_name") or "") + " " + (session["metadata"].get("last_name") or "")
+        ).strip()
         session["metadata"]["greeting"] = get_lisbon_greeting()
         # pprint(session)
         # print()

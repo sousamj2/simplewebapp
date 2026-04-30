@@ -7,6 +7,11 @@ from simplewebapp.Funhelpers.render_profile_template import render_profile_templ
 
 # Define a blueprint for each page
 bp_home = Blueprint('home', __name__, url_prefix='/')
+bp_maps = Blueprint('maps', __name__, url_prefix='/maps')
+bp_prices = Blueprint('prices', __name__, url_prefix='/prices')
+bp_calendar = Blueprint('calendar', __name__, url_prefix='/calendar')
+bp_terms = Blueprint('terms', __name__, url_prefix='/terms')
+bp_adminDB = Blueprint('adminDB', __name__, url_prefix='/adminDB')
 
 def render_page(blueprint, route="/", template_name="home", page_title="Explicações em Lisboa", title="Explicações em Lisboa", metadata=None):
     """
@@ -70,6 +75,11 @@ def render_page(blueprint, route="/", template_name="home", page_title="Explica�
 
 # Register each page route with its blueprint
 render_page(bp_home, route="/", template_name="home", page_title="Explicações em Lisboa", title="Explicações em Lisboa", metadata={})
+render_page(bp_maps, route="/", template_name="maps", page_title="Explicações em Lisboa", title="Explicações em Lisboa", metadata={})
+render_page(bp_prices, route="/", template_name="prices", page_title="Explicações em Lisboa", title="Explicações em Lisboa", metadata={})
+render_page(bp_calendar, route="/", template_name="calendar", page_title="Explicações em Lisboa", title="Explicações em Lisboa", metadata={})
+render_page(bp_terms, route="/", template_name="terms", page_title="Explicações em Lisboa", title="Explicações em Lisboa", metadata={})
+render_page(bp_adminDB, route="/", template_name="adminDB", page_title="Explicações em Lisboa", title="Explicações em Lisboa", metadata={})
 
 # render_page(pages_bp,route="/profile" , template_name="profile"  , page_title="Explicações em Lisboa", title="Explicações em Lisboa",metadata={session["metadata"]})
 # render_page(pages_bp,route="/signin"  , template_name="signin"   , page_title="Explicações em Lisboa", title="Explicações em Lisboa",metadata={})

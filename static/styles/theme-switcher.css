@@ -1,0 +1,45 @@
+.theme-switcher {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    background: var(--card-bg);
+    border-radius: 30px;
+    padding: 5px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 1000;
+    border: 1px solid var(--card-shadow);
+    gap: 5px;
+}
+
+.theme-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    font-size: 24px; /* Larger as requested */
+}
+
+.theme-btn:hover {
+    background: rgba(128, 128, 128, 0.1);
+}
+
+.theme-btn.active {
+    background: var(--blue-title);
+    color: white;
+}
+
+[data-theme="dark"] .theme-btn.active {
+    background: var(--yellow-header);
+    color: black;
+}
+
+/* Icons using emoji for simplicity, but could use SVG */
+.theme-btn::before {
+    content: attr(data-icon);
+}

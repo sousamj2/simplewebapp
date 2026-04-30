@@ -8,21 +8,23 @@
   /* Menu (coluna esquerda) */
   .menu {
     width: var(--menu-width);
-    background: #fff;
+    background: var(--card-bg);
     border-radius: var(--round);
-    box-shadow: 0 2px 6px rgba(60,60,60,0.09);
+    box-shadow: 0 2px 6px var(--card-shadow);
     padding: 32px 12px;
     display: flex;
     flex-direction: column;
+    color: var(--text-color);
   }
   
   /* Main content (coluna direita) */
   .main-content {
     width: var(--main-width);
-    background: #fff;
+    background: var(--card-bg);
     border-radius: var(--round);
-    box-shadow: 0 2px 6px rgba(60,60,60,0.09);
+    box-shadow: 0 2px 6px var(--card-shadow);
     padding: 40px 24px;
+    color: var(--text-color);
   }
-  .main-content h2 { color: #2563eb; margin-top: 0; }
+  .main-content h2 { color: var(--link-color); margin-top: 0; }
   

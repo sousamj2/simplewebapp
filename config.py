@@ -17,7 +17,7 @@ def _import_boto3():
         return None
 
 APP_NAME = os.getenv("APP_NAME", "explicolivais")
-APP_ENV = os.getenv("APP_ENV","dev")  # "production" or "development" or "testing"
+APP_ENV = os.getenv("APP_ENV","local")  # "production" or "local" or "testing"
 
 # Heuristic to decide environment if APP_ENV not set
 def _is_aws_host() -> bool:
@@ -78,10 +78,10 @@ def _get(key: str, default: Optional[str] = None, required: bool = False) -> Opt
 
 class Config:
     # Flask
-    SECRET_KEY = _get("FLASK_SECRET_KEY", required=True)
+    SECRET_KEY = _get("FLASK_SECRET_KEY") or _get("SECRET_KEY", required=True)
 
     # Admin config
-    ADMIN_EMAIL = _get("ADMINDB_EMAIL", required=True)
+    ADMIN_EMAIL = _get("ADMINDB_EMAIL") or _get("ADMIN_EMAIL") or "admin@example.com"
     if ADMIN_EMAIL:
         ADMIN_EMAIL = ADMIN_EMAIL.lower()
 
@@ -134,9 +134,9 @@ class Config:
     # RDS Connection to MySQL
     MYSQL_PASSWORD = _get("MYSQL_PASSWORD")
     MYSQL_HOST     = _get("MYSQL_HOST")
-    MYSQL_USER     = "admin"
-    MYSQL_DBNAME   = "explicolivais"
-    MYSQL_PORT     = 3306
+    MYSQL_USER     = _get("MYSQL_USER", "admin")
+    MYSQL_DBNAME   = _get("MYSQL_DBNAME", "explicolivais")
+    MYSQL_PORT     = int(_get("MYSQL_PORT", "3306"))
     # print(MYSQL_PASSWORD)
     # print(MYSQL_HOST    )
     # print(MYSQL_USER    )

@@ -17,17 +17,17 @@
   cursor: pointer;
   transition: background 0.2s;
 }
-.menu li:hover { background: #edf2fb; }
+.menu li:hover { background: var(--bg-color); opacity: 0.8; }
 
 .menu a {
-  color: #2563eb;
+  color: var(--link-color);
   text-decoration: none;
   font-weight: bold;
   display: block;
   padding: 10px 0;
   border-radius: var(--round);
 }
-.menu a:hover { background-color: #edf2fb; color: #003d99; }
+.menu a:hover { background-color: var(--bg-color); opacity: 0.8; }
 
 /* Google button */
 .google-btn {
