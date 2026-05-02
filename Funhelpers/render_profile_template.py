@@ -3,6 +3,7 @@ from markupsafe import Markup
 
 from .format_data import format_data
 from flask import session
+from .mc_rcon import get_player_stats
 
 
 def render_profile_template(template_text):
@@ -11,34 +12,31 @@ def render_profile_template(template_text):
     metadata = session.get("metadata", {})
     # print("lastlogints",metadata.get("lastlogints", ""))
     template_text = str(template_text)
-    # Example replacements; add more as needed
+    
+    # Core user info
     rendered = template_text.replace("{{user_picture}}", userinfo.get("picture", ""))
-    rendered = rendered.replace("{{greeting}}", metadata.get("greeting", ""))
     rendered = rendered.replace("{{nome}}", " ".join([metadata.get("first_name", ""), metadata.get("last_name", "")]))
     rendered = rendered.replace("{{email}}", metadata.get("email", ""))
     rendered = rendered.replace("{{lastlogin}}", format_data(metadata.get("lastlogints", "")))
-    rendered = rendered.replace("{{morada}}", metadata.get("full_address", ""))
-    rendered = rendered.replace("{{codigopostal}}", str(metadata.get("zip_code1", ""))+'-'+str(metadata.get("zip_code2", ""))) 
-    rendered = rendered.replace("{{nif}}", str(metadata.get("nfiscal", "")))
-    rendered = rendered.replace("{{telemovel}}", str(metadata.get("cell_phone", "")))
+    rendered = rendered.replace("{{ign}}", str(metadata.get("ign", "NA")))
+    
+    # Minecraft Stats (Fetch if server is likely online)
+    ign = metadata.get("ign")
+    print("DEBUG", ign, flush=True)
+    if ign:
+        stats = get_player_stats(ign)
+        print("DEBUG", stats, flush=True)
+        rendered = rendered.replace("{{player_rank}}", stats.get("rank", "NA"))
+        rendered = rendered.replace("{{player_bank}}", stats.get("bank", "NA"))
+        rendered = rendered.replace("{{player_claims}}", stats.get("claims", "NA"))
+        rendered = rendered.replace("{{player_uuid}}", stats.get("uuid", "NA"))
+    else:
+        rendered = rendered.replace("{{player_rank}}", "NA")
+        rendered = rendered.replace("{{player_bank}}", "NA")
+        rendered = rendered.replace("{{player_claims}}", "NA")
+        rendered = rendered.replace("{{player_uuid}}", "NA")
 
-    rendered = rendered.replace("{{cell_phone}}", str(metadata.get("cell_phone", "")))
-    rendered = rendered.replace("{{zip_code1}}", str(metadata.get("zip_code1", "")))
-    rendered = rendered.replace("{{zip_code2}}", str(metadata.get("zip_code2", "")))
-    rendered = rendered.replace("{{address}}", str(metadata.get("address", "")))
-    rendered = rendered.replace("{{number}}", str(metadata.get("number", "")))
-    rendered = rendered.replace("{{floor}}", str(metadata.get("floor", "")))
-    rendered = rendered.replace("{{door}}", str(metadata.get("door", "")))
-    rendered = rendered.replace("{{nfiscal}}", str(metadata.get("nfiscal", "")))
     rendered = rendered.replace("{{error_message}}", str(metadata.get("error_message", "")))
-    rendered = rendered.replace("{{gg_address}}", str(format_address_for_url(metadata.get("g_address",""))))
-    # Replace boolean fields for LEDs (example: 'green' if True else 'orange')
-    vpn_check = metadata.get("vpn_check", False)
-    primeiro_contacto = metadata.get("first_contact_complete", False)
-    primeira_aula = metadata.get("first_session_complete", False)
-    rendered = rendered.replace("{{vpn_check_color}}", "green" if vpn_check else "orange")
-    rendered = rendered.replace("{{primeiro_contacto_color}}", "green" if primeiro_contacto else "orange")
-    rendered = rendered.replace("{{primeira_aula_color}}", "green" if primeira_aula else "orange")
 
     return Markup(rendered)
 

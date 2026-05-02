@@ -1,36 +1,86 @@
-<div class="hero-section" style="text-align: center; margin-bottom: 2rem;">
-    <img src="{{ url_for('static', filename='images/mjcrafts_banner.png') }}" alt="Mostly Jovial Crafters Banner" style="max-width: 100%; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+<div class="banner-home">
+    <div class="banner-wrapper">
+        <img src="{{ url_for('static', filename='images/mjcrafts_banner.png') }}" alt="Mostly Jovial Crafters" class="main-banner">
+        <h1 class="banner-title">{{ title }}</h1>
+    </div>
 </div>
 
-<div class="server-status-box" style="text-align: center; padding: 2rem; background: var(--bg-card); border-radius: 8px; margin-bottom: 2rem; box-shadow: 0 4px 6px var(--shadow-sm);">
+<div class="server-status-box card">
     <h2>Server Status</h2>
-    {% if metadata and metadata.mc_status %}
-        {% if metadata.mc_status.online %}
-            <p style="color: var(--success-color, #28a745); font-weight: bold; font-size: 1.2rem;">ONLINE</p>
-            <p>Players Online: {{ metadata.mc_status.players_online }} / {{ metadata.mc_status.players_max }}</p>
-            {% if metadata.mc_status.motd %}
-                <p><i>{{ metadata.mc_status.motd }}</i></p>
-            {% endif %}
-            <p><small>Ping: {{ metadata.mc_status.latency }}ms</small></p>
-        {% else %}
-            <p style="color: var(--error-color, #dc3545); font-weight: bold; font-size: 1.2rem;">OFFLINE</p>
-            
-            {% if not user %}
-                <p>The server is currently offline. Please <a href="{{ url_for('signin.signin') }}">sign in</a> to restart the server.</p>
+    <div id="status-container">
+        {% if metadata and metadata.mc_status %}
+            {% if metadata.mc_status.online %}
+                <p class="status-online">ONLINE</p>
+                <p>Players: {{ metadata.mc_status.players_online }} / {{ metadata.mc_status.players_max }}</p>
+                {% if metadata.mc_status.motd %}
+                    <p class="motd"><i>{{ metadata.mc_status.motd }}</i></p>
+                {% endif %}
             {% else %}
-                <p>The server is currently offline.</p>
-                <form action="/server/resume" method="POST">
-                    <button type="submit" class="btn btn--primary" style="margin-top: 1rem;">Start Server</button>
-                </form>
+                <p class="status-offline">OFFLINE</p>
+                
+                {% if not user %}
+                    <p>The server is offline. <a href="{{ url_for('signin.signin') }}">Sign in</a> to restart it.</p>
+                {% elif session.get('waiting_for_resume_code') %}
+                    <div class="verify-code-box">
+                        <p>A code was sent to <strong>{{ session.get('resume_email') }}</strong></p>
+                        <form action="/server/verify_code" method="POST" class="short-code-form">
+                            <label for="code">Insert code here:</label>
+                            <input type="text" id="code" name="code" maxlength="10" placeholder="A1B2C3D4E5" required autocomplete="off">
+                            <button type="submit" class="btn btn--primary">Verify & Start</button>
+                        </form>
+                    </div>
+                {% elif session.get('resume_in_progress') %}
+                    <div id="progress-container">
+                        <p id="progress-msg">Initializing...</p>
+                        <div class="progress-bar-bg">
+                            <div id="progress-bar" class="progress-bar-fill" style="width: 0%"></div>
+                        </div>
+                    </div>
+                {% else %}
+                    <form action="/server/resume" method="POST">
+                        <button type="submit" class="btn btn--primary">Start Server</button>
+                    </form>
+                {% endif %}
             {% endif %}
+        {% else %}
+            <p>Checking server status...</p>
         {% endif %}
-    {% else %}
-        <p>Checking server status...</p>
-    {% endif %}
+    </div>
 </div>
 
-<div class="info-section">
+<div class="info-section card">
     <h3>Welcome to Mostly Jovial Crafters!</h3>
     <p>Our Minecraft server focuses on community and creating a fun experience for everyone.</p>
-    <p>To start playing, please read our <a href="{{ url_for('rules.view_func_rules') }}">rules</a> and join us at <strong>mc.mjcrafts.pt</strong>.</p>
+    <p>Join us at <strong>mc.mjcrafts.pt</strong>.</p>
 </div>
+
+<script>
+{% if session.get('resume_in_progress') %}
+    function pollStatus() {
+        fetch('/server/status')
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'none') return;
+                
+                const msg = document.getElementById('progress-msg');
+                const bar = document.getElementById('progress-bar');
+                
+                if (msg) msg.innerText = data.message;
+                if (bar) bar.style.width = data.progress + '%';
+                
+                if (data.step === 'completed') {
+                    setTimeout(() => {
+                        window.location.href = '/profile';
+                    }, 10000);
+                } else if (data.step === 'failed') {
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 5000);
+                } else {
+                    setTimeout(pollStatus, 2000);
+                }
+            });
+    }
+    document.addEventListener('DOMContentLoaded', pollStatus);
+{% endif %}
+</script>

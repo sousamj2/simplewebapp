@@ -1,16 +1,50 @@
+<div class="banner-profile">
+    <img src="{{ url_for('static', filename='images/mjcrafts_banner_profile.png') }}" alt="MJCRAFTS" class="profile-banner">
+</div>
+
 <div class="profile-container">
-    <!-- Top welcome block -->
-    <div class="welcome-block">
-        <h1>Hello {{full_name}}!</h1>
-        {% if ign %}
-            <h3>IGN: <code>{{ ign }}</code></h3>
-        {% endif %}
-        <h2>Your last login was at {{lastlogin}}</h2>
+    <!-- Top welcome block with Avatar -->
+    <div class="welcome-block card profile-header">
+        <div class="profile-avatar">
+            {% if player_uuid and player_uuid != "NA" %}
+                <img src="https://mc-heads.net/avatar/{{ player_uuid }}/100.png" alt="Player Avatar" class="mc-avatar">
+            {% else %}
+                <img src="{{ user_picture }}" alt="User Picture" class="mc-avatar">
+            {% endif %}
+        </div>
+        <div class="profile-info">
+            <h1>Hello {{nome}}!</h1>
+            {% if ign %}
+                <h3>IGN: <code>{{ ign }}</code></h3>
+                <p><small>UUID: <code>{{ player_uuid }}</code></small></p>
+            {% endif %}
+            <p>Your last login was at {{lastlogin}}</p>
+        </div>
     </div>
 
-    <br>
+    <div class="stats-section card">
+        <h2>Player Stats</h2>
+        <div class="stats-grid">
+            <div class="stat-item">
+                <span class="stat-label">Player:</span>
+                <span class="stat-value">{{ ign }}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Rank:</span>
+                <span class="stat-value">{{ player_rank }}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Bank:</span>
+                <span class="stat-value">{{ player_bank }}€</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Claims:</span>
+                <span class="stat-value">{{ player_claims }}</span>
+            </div>
+        </div>
+    </div>
 
-    <div class="info-section">
+    <div class="info-section card">
         <p>Welcome to your <strong>Mostly Jovial Crafters</strong> profile. Here you can manage your account and access server-related features.</p>
     </div>
 </div>

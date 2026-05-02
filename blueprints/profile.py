@@ -53,6 +53,11 @@ def profile():
         ).strip()
         session["metadata"]["greeting"] = get_lisbon_greeting()
 
+        # Fetch Minecraft stats
+        from simplewebapp.Funhelpers.mc_rcon import get_player_stats
+        ign = session["metadata"].get("ign")
+        stats = get_player_stats(ign) if ign else {}
+
         return render_template(
             "index.html",
             admin_email=current_app.config["ADMIN_EMAIL"],
@@ -62,11 +67,15 @@ def profile():
             title="Mostly Jovial Crafters",
             content_template="content/profile.html",
             greeting=session["metadata"]["greeting"],
-            full_name=session["metadata"].get("full_name", ""),
+            nome=session["metadata"].get("full_name", ""),
             email=session["metadata"].get("email", ""),
             ign=session["metadata"].get("ign", ""),
             lastlogin=format_data(session["metadata"].get("lastlogints", "")),
             user_picture=mypict,
+            player_rank=stats.get("rank", "NA"),
+            player_bank=stats.get("bank", "NA"),
+            player_claims=stats.get("claims", "NA"),
+            player_uuid=stats.get("uuid", "NA"),
         )
 
     else:
