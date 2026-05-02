@@ -1,7 +1,7 @@
+<li><a href="{{ url_for('profile.profile') }}">Profile</a></li>
 <li><a href="{{ url_for('home.view_func_home') }}">Home</a></li>
 <li><a href="{{ url_for('rules.view_func_rules') }}">Rules</a></li>
 <li><a href="{{ url_for('commands.view_func_available_commands') }}">Commands</a></li>
 <li><a href="{{ url_for('tiers.view_func_tiers') }}">Tiers</a></li>
 <li><a href="{{ url_for('support.view_func_support') }}">Support</a></li>
-<li><a href="{{ url_for('profile.profile') }}">{{ session['metadata']['full_name'] }}</a></li>
 <li><a href="{{ url_for('logout.logout') }}">Sign Out</a></li>

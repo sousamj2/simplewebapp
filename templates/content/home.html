@@ -1,57 +1,60 @@
-<div class="banner-home">
-    <div class="banner-wrapper">
-        <img src="{{ url_for('static', filename='images/mjcrafts_banner.png') }}" alt="Mostly Jovial Crafters" class="main-banner">
-        <h1 class="banner-title">{{ title }}</h1>
-    </div>
-</div>
+<div class="home-grid-top">
+    <!-- Left Column: Info and Status -->
+    <div class="home-info-column">
+        <div class="info-section card">
+            <h3>Welcome to Mostly Jovial Crafters!</h3>
+            <p>Our Minecraft server focuses on community and creating a fun experience for everyone.</p>
+            <p>Join us at <strong>mc.mjcrafts.pt</strong>.</p>
+        </div>
 
-<div class="server-status-box card">
-    <h2>Server Status</h2>
-    <div id="status-container">
-        {% if metadata and metadata.mc_status %}
-            {% if metadata.mc_status.online %}
-                <p class="status-online">ONLINE</p>
-                <p>Players: {{ metadata.mc_status.players_online }} / {{ metadata.mc_status.players_max }}</p>
-                {% if metadata.mc_status.motd %}
-                    <p class="motd"><i>{{ metadata.mc_status.motd }}</i></p>
-                {% endif %}
-            {% else %}
-                <p class="status-offline">OFFLINE</p>
-                
-                {% if not user %}
-                    <p>The server is offline. <a href="{{ url_for('signin.signin') }}">Sign in</a> to restart it.</p>
-                {% elif session.get('waiting_for_resume_code') %}
-                    <div class="verify-code-box">
-                        <p>A code was sent to <strong>{{ session.get('resume_email') }}</strong></p>
-                        <form action="/server/verify_code" method="POST" class="short-code-form">
-                            <label for="code">Insert code here:</label>
-                            <input type="text" id="code" name="code" maxlength="10" placeholder="A1B2C3D4E5" required autocomplete="off">
-                            <button type="submit" class="btn btn--primary">Verify & Start</button>
-                        </form>
-                    </div>
-                {% elif session.get('resume_in_progress') %}
-                    <div id="progress-container">
-                        <p id="progress-msg">Initializing...</p>
-                        <div class="progress-bar-bg">
-                            <div id="progress-bar" class="progress-bar-fill" style="width: 0%"></div>
-                        </div>
-                    </div>
+        <div class="server-status-box card">
+            <h2>Server Status</h2>
+            <div id="status-container">
+                {% if metadata and metadata.mc_status %}
+                    {% if metadata.mc_status.online %}
+                        <p class="status-online">ONLINE</p>
+                        <p>Players: {{ metadata.mc_status.players_online }} / {{ metadata.mc_status.players_max }}</p>
+                        {% if metadata.mc_status.motd %}
+                            <p class="motd"><i>{{ metadata.mc_status.motd }}</i></p>
+                        {% endif %}
+                    {% else %}
+                        <p class="status-offline">OFFLINE</p>
+                        
+                        {% if not user %}
+                            <p>The server is offline. <a href="{{ url_for('signin.signin') }}">Sign in</a> to restart it.</p>
+                        {% elif session.get('waiting_for_resume_code') %}
+                            <div class="verify-code-box">
+                                <p>A code was sent to <strong>{{ session.get('resume_email') }}</strong></p>
+                                <form action="/server/verify_code" method="POST" class="short-code-form">
+                                    <label for="code">Insert code here:</label>
+                                    <input type="text" id="code" name="code" maxlength="10" placeholder="A1B2C3D4E5" required autocomplete="off">
+                                    <button type="submit" class="btn btn--primary">Verify & Start</button>
+                                </form>
+                            </div>
+                        {% elif session.get('resume_in_progress') %}
+                            <div id="progress-container">
+                                <p id="progress-msg">Initializing...</p>
+                                <div class="progress-bar-bg">
+                                    <div id="progress-bar" class="progress-bar-fill" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <form action="/server/resume" method="POST">
+                                <button type="submit" class="btn btn--primary">Start Server</button>
+                            </form>
+                        {% endif %}
+                    {% endif %}
                 {% else %}
-                    <form action="/server/resume" method="POST">
-                        <button type="submit" class="btn btn--primary">Start Server</button>
-                    </form>
+                    <p>Checking server status...</p>
                 {% endif %}
-            {% endif %}
-        {% else %}
-            <p>Checking server status...</p>
-        {% endif %}
+            </div>
+        </div>
     </div>
-</div>
 
-<div class="info-section card">
-    <h3>Welcome to Mostly Jovial Crafters!</h3>
-    <p>Our Minecraft server focuses on community and creating a fun experience for everyone.</p>
-    <p>Join us at <strong>mc.mjcrafts.pt</strong>.</p>
+    <!-- Right Column: Banner -->
+    <div class="home-banner-container">
+        <img src="{{ url_for('static', filename='images/mjcrafts_banner.png') }}" alt="Mostly Jovial Crafters" class="main-banner">
+    </div>
 </div>
 
 <script>

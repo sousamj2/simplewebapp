@@ -15,6 +15,11 @@
      <div class="container">
          <div class="columns">
              <nav class="menu">
+                 {% if session is defined and session['metadata'] is defined %}
+                 <div class="menu-header">
+                     <span class="menu-user-name">{{ session['metadata'].get('full_name', 'Player') }}</span>
+                 </div>
+                 {% endif %}
                  <ul>
                      {% if session is defined and session['metadata'] is defined and session['metadata']['email'] is defined and session['metadata']['email'] == admin_email %}
                      {% include 'content/menu-admin.html' %}
