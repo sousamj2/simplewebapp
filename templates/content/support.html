@@ -1,4 +1,33 @@
-<div class="info-box">
-    <h2>Suporte</h2>
-    <p>Text here</p>
+<div class="page-content">
+    <h1 class="page-title">Support</h1>
+    <p class="page-subtitle">Need help? Here's how to reach us and how the server operates.</p>
+
+    <div class="card">
+        <h2>🖥️ How the Server Works</h2>
+        <p>The server runs on <strong>Google Cloud Platform (GCP)</strong> and is paid for personally by the admin. To keep costs manageable, the server is automatically suspended when no players are online.</p>
+        <h3>To start the server:</h3>
+        <ol class="rule-list">
+            <li>Log in to <strong>mc.mjcrafts.pt</strong> (this website)</li>
+            <li>Go to your <a href="{{ url_for('profile.profile') if user else url_for('signin.signin') }}">Profile page</a></li>
+            <li>Click <strong>"Start Server"</strong> and confirm with the code sent to your email</li>
+            <li>Wait <strong>30 seconds to 2 minutes</strong> — the server will come online automatically</li>
+        </ol>
+        <p>If the server does not respond within <strong>5 minutes</strong>, the admin is notified and will investigate as soon as possible.</p>
+        <p class="rank-note">💡 If a <strong>PATREON</strong> sponsor supports the server, it can run 24/7 (~€150/year), removing the need to start it manually.</p>
+    </div>
+
+    <div class="card">
+        <h2>💬 Contact & Reporting</h2>
+        <p>For bug reports, rule violations, or general questions, please reach out via <strong>Discord</strong>. You can also report incidents involving harassment or discrimination directly to the admin in-game or via Discord.</p>
+        <p><em>Discord link coming soon.</em></p>
+    </div>
+
+    <div class="card payment-card">
+        <h2>☕ Support the Server</h2>
+        <p>If you'd like to help keep the server running, you can make a contribution via <strong>Buy Me a Coffee</strong>. Please include your Minecraft username so we can credit you with the appropriate rank.</p>
+        <a href="https://www.buymeacoffee.com/mjcrafts" target="_blank" class="btn btn--primary">☕ Buy Me a Coffee</a>
+        <div class="payment-info">
+            <p>See the <a href="{{ url_for('tiers.view_func_tiers') }}">Ranks page</a> for pricing details.</p>
+        </div>
+    </div>
 </div>

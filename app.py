@@ -20,7 +20,7 @@ from mailinteraction import bp_register, bp_request_new_user
 from blueprints import (
     bp_home, bp_profile, 
     bp_calendar, bp_adminDB,
-    bp_rules, bp_commands, bp_tiers, bp_support
+    bp_rules, bp_commands, bp_tiers, bp_support, bp_getting_started
 )
 
 
@@ -67,6 +67,7 @@ def create_app(config_name=None):
     app.register_blueprint(bp_commands)
     app.register_blueprint(bp_tiers)
     app.register_blueprint(bp_support)
+    app.register_blueprint(bp_getting_started)
     
     
     # Main route: redirect to /pages/ (home)

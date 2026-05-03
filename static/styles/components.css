@@ -271,3 +271,289 @@
     max-width: 100%;
   }
 }
+
+/* ─── Page Content Wrapper ─────────────────── */
+.page-content {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 8px 0 32px;
+}
+
+.page-title {
+  font-size: 2rem;
+  margin-bottom: 4px;
+}
+
+.page-subtitle {
+  color: var(--text-secondary, #888);
+  margin-bottom: 28px;
+  font-size: 1.05rem;
+}
+
+/* ─── Rule Cards ────────────────────────────── */
+.rule-card {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.rule-number {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--blue-title, #4a90d9);
+  color: #fff;
+  font-weight: bold;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rule-body h2 {
+  margin-top: 0;
+  font-size: 1.15rem;
+}
+
+.rule-list {
+  padding-left: 1.3em;
+  line-height: 1.8;
+}
+
+/* ─── Getting Started Steps ─────────────────── */
+.gs-step {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.gs-step-number {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--yellow-title, #f0a500);
+  color: #fff;
+  font-weight: bold;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gs-step-body {
+  flex: 1;
+}
+
+.gs-step-body h2 {
+  margin-top: 0;
+  font-size: 1.2rem;
+}
+
+.gs-note {
+  font-size: 0.92rem;
+  color: var(--text-secondary, #888);
+  margin-top: 8px;
+}
+
+.gs-success {
+  color: #28a745;
+  font-weight: 500;
+}
+
+.gs-actions {
+  margin-top: 14px;
+}
+
+.gs-links-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.gs-link-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px;
+  background: var(--bg-color);
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.08);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.gs-link-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+}
+
+.gs-link-icon {
+  font-size: 1.6rem;
+  margin-bottom: 4px;
+}
+
+.gs-link-card span:last-child {
+  font-size: 0.85rem;
+  color: var(--text-secondary, #888);
+}
+
+.server-address-box {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--bg-color);
+  border-radius: 8px;
+  padding: 12px 18px;
+  margin: 14px 0;
+  width: fit-content;
+}
+
+.server-address-label {
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-secondary, #888);
+}
+
+.server-address {
+  font-size: 1.3rem;
+  font-family: monospace;
+  color: var(--yellow-title, #f0a500);
+  letter-spacing: 1px;
+}
+
+/* ─── Accordion ─────────────────────────────── */
+.accordion-item {
+  padding: 0;
+  overflow: hidden;
+}
+
+.accordion-btn {
+  width: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  font-size: 1.05rem;
+  font-weight: bold;
+  color: inherit;
+  text-align: left;
+  transition: background 0.2s;
+}
+
+.accordion-btn:hover {
+  background: var(--bg-color);
+}
+
+.accordion-icon {
+  font-size: 1.4rem;
+  line-height: 1;
+  transition: transform 0.2s;
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+
+.accordion-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s ease;
+  padding: 0 24px;
+}
+
+.accordion-btn[aria-expanded="true"] + .accordion-body {
+  padding: 0 24px 20px;
+}
+
+/* ─── Info Tables ───────────────────────────── */
+.info-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+  font-size: 0.95rem;
+}
+
+.info-table th,
+.info-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(128,128,128,0.2);
+  text-align: left;
+}
+
+.info-table th {
+  font-weight: bold;
+  color: var(--link-color);
+}
+
+/* ─── Rank Table ────────────────────────────── */
+.table-scroll {
+  overflow-x: auto;
+}
+
+.rank-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  margin-top: 12px;
+}
+
+.rank-table th,
+.rank-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(128,128,128,0.2);
+  text-align: center;
+}
+
+.rank-table td:first-child,
+.rank-table th:first-child {
+  text-align: left;
+}
+
+.rank-col {
+  min-width: 90px;
+}
+
+.rank-highlight {
+  background: rgba(74, 144, 217, 0.12);
+  font-weight: bold;
+}
+
+.rank-patreon {
+  background: rgba(240, 165, 0, 0.1);
+  font-weight: bold;
+}
+
+.rank-note {
+  font-size: 0.88rem;
+  color: var(--text-secondary, #888);
+  margin-top: 10px;
+}
+
+/* ─── Payment Card ──────────────────────────── */
+.payment-card .btn {
+  margin-top: 14px;
+  display: inline-block;
+}
+
+.payment-info {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(128,128,128,0.2);
+  font-size: 0.93rem;
+}
+
+@media (max-width: 600px) {
+  .gs-step, .rule-card {
+    flex-direction: column;
+  }
+  .gs-links-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}

@@ -66,6 +66,31 @@ def profile():
         # Merge mc_status into metadata for the template
         session["metadata"]["mc_status"] = mc_status
 
+        # --- Session Cleanup Logic ---
+        # 1. If server is online, clear all resume-related flags
+        if mc_status.get("online"):
+            session.pop("resume_in_progress", None)
+            session.pop("waiting_for_resume_code", None)
+            session.pop("new_resume_request", None)
+        else:
+            # 2. Handle "Refresh resets the token" requirement
+            if session.get("waiting_for_resume_code"):
+                if session.get("new_resume_request"):
+                    # This is the first load after the redirect. Consume the flag.
+                    session["new_resume_request"] = False
+                else:
+                    # The user refreshed the page or came back later. Reset to Start button.
+                    session.pop("waiting_for_resume_code", None)
+                    session.pop("resume_email", None)
+
+            # 3. Check for stale progress bar
+            if session.get("resume_in_progress"):
+                from authenticate.server_actions import server_progress
+                session_id = session.get("session_id") or session.get("resume_email")
+                if not session_id or session_id not in server_progress:
+                    # Task is finished, failed or lost. Clear flag to show Start button again.
+                    session.pop("resume_in_progress", None)
+        # -----------------------------
         return render_template(
             "index.html",
             admin_email=current_app.config["ADMIN_EMAIL"],
