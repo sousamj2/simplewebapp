@@ -106,6 +106,12 @@ def check_and_suspend():
 
     # Suspend!
     print("DEBUG AUTO-SUSPEND: IDLE THRESHOLD EXCEEDED. Suspending instance...")
+    
+    # 1. Stop the monitoring timer so it doesn't fire while VM is starting later
+    print("DEBUG AUTO-SUSPEND: Stopping auto-suspend timer...")
+    run_cmd("sudo systemctl stop mc_auto_suspend.timer")
+    
+    # 2. Suspend the instance
     suspend_cmd = f"gcloud compute instances suspend {INSTANCE_NAME} --zone {ZONE} --project {PROJECT_ID} --quiet"
     run_cmd(suspend_cmd)
     print("DEBUG AUTO-SUSPEND: Suspend command issued.")
