@@ -19,29 +19,11 @@
                         {% endif %}
                     {% else %}
                         <p class="status-offline">OFFLINE</p>
-                        
-                        {% if not user %}
-                            <p>The server is offline. <a href="{{ url_for('signin.signin') }}">Sign in</a> to restart it.</p>
-                        {% elif session.get('waiting_for_resume_code') %}
-                            <div class="verify-code-box">
-                                <p>A code was sent to <strong>{{ session.get('resume_email') }}</strong></p>
-                                <form action="/server/verify_code" method="POST" class="short-code-form">
-                                    <label for="code">Insert code here:</label>
-                                    <input type="text" id="code" name="code" maxlength="10" placeholder="A1B2C3D4E5" required autocomplete="off">
-                                    <button type="submit" class="btn btn--primary">Verify & Start</button>
-                                </form>
-                            </div>
-                        {% elif session.get('resume_in_progress') %}
-                            <div id="progress-container">
-                                <p id="progress-msg">Initializing...</p>
-                                <div class="progress-bar-bg">
-                                    <div id="progress-bar" class="progress-bar-fill" style="width: 0%"></div>
-                                </div>
-                            </div>
+                        <p>The server is currently offline.</p>
+                        {% if user %}
+                            <p>You can restart the server from your <a href="{{ url_for('profile.profile') }}">profile</a>.</p>
                         {% else %}
-                            <form action="/server/resume" method="POST">
-                                <button type="submit" class="btn btn--primary">Start Server</button>
-                            </form>
+                            <p><a href="{{ url_for('signin.signin') }}">Sign in</a> to manage the server.</p>
                         {% endif %}
                     {% endif %}
                 {% else %}
@@ -56,34 +38,3 @@
         <img src="{{ url_for('static', filename='images/mjcrafts_banner.png') }}" alt="Mostly Jovial Crafters" class="main-banner">
     </div>
 </div>
-
-<script>
-{% if session.get('resume_in_progress') %}
-    function pollStatus() {
-        fetch('/server/status')
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'none') return;
-                
-                const msg = document.getElementById('progress-msg');
-                const bar = document.getElementById('progress-bar');
-                
-                if (msg) msg.innerText = data.message;
-                if (bar) bar.style.width = data.progress + '%';
-                
-                if (data.step === 'completed') {
-                    setTimeout(() => {
-                        window.location.href = '/profile';
-                    }, 10000);
-                } else if (data.step === 'failed') {
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 5000);
-                } else {
-                    setTimeout(pollStatus, 2000);
-                }
-            });
-    }
-    document.addEventListener('DOMContentLoaded', pollStatus);
-{% endif %}
-</script>

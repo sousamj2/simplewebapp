@@ -14,7 +14,7 @@ def run_rcon_command(command):
     if not password:
         return "Error: RCON password not configured"
         
-    print(f"DEBUG RCON: Attempting connection to {host}:{port}", flush=True)
+    # print(f"DEBUG RCON: Attempting connection to {host}:{port}", flush=True)
     
     try:
         # Create socket

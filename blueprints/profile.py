@@ -55,8 +55,16 @@ def profile():
 
         # Fetch Minecraft stats
         from simplewebapp.Funhelpers.mc_rcon import get_player_stats
+        from simplewebapp.Funhelpers.mc_server_status import get_mc_status
+        
+        mc_status = get_mc_status()
         ign = session["metadata"].get("ign")
-        stats = get_player_stats(ign) if ign else {}
+        stats = {}
+        if ign and mc_status.get("online"):
+            stats = get_player_stats(ign)
+        
+        # Merge mc_status into metadata for the template
+        session["metadata"]["mc_status"] = mc_status
 
         return render_template(
             "index.html",

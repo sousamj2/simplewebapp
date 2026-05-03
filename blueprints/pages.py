@@ -54,7 +54,7 @@ def render_page(blueprint, route="/", template_name="home", page_title="Mostly J
             user = None
 
         template_metadata = dict(metadata)
-        if template_name == "home":
+        if template_name in ["home", "profile"]:
             template_metadata["mc_status"] = get_mc_status()
 
         return render_template(
