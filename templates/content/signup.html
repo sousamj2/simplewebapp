@@ -1,7 +1,6 @@
+<h1>Database Registration</h1> <br> 
 
-<h1>Registo na base de dados</h1> <br> 
-
-<form id="signupForm" action="{{ url_for('updateDB.updateDB') }}" method="post" onsubmit="openGoogleCalendar()">
+<form id="signupForm" action="{{ url_for('updateDB.updateDB') }}" method="post">
 
   
   <!-- Top Row: Email -->
@@ -57,10 +56,16 @@
             {% endif %}
           </div>
         </div>
+        <div class="form-row" style="margin-top: 1em;">
+          <div class="form-col">
+            <label for="ign">Minecraft In-Game Name (IGN)<span class="required">*</span></label><br>
+            <input type="text" name="ign" id="ign" value="" required placeholder="Your Minecraft username">
+          </div>
+        </div>
 
       </div>
       <input type="submit" value="Submit">
-      <p> content Nenhum dado será partilhado fora da aplicação. </p>  
+      <p> No data will be shared outside of the application. </p>  
   </div>
 
   
@@ -69,7 +74,7 @@
 
 <!-- Optional: JS for confirming password match -->
 <script>
-  document.getElementById('signup-form').addEventListener('submit', function (e) {
+  document.getElementById('signupForm').addEventListener('submit', function (e) {
     let pwd = document.getElementById('password');
     let confirmPwd = document.getElementById('confirm_password');
     if (pwd && confirmPwd && pwd.value !== confirmPwd.value) {
@@ -102,7 +107,7 @@ const requiredFields = document.querySelectorAll('input[required], textarea[requ
 requiredFields.forEach(field => {
   field.addEventListener('invalid', function () {
     if (field.validity.valueMissing) {
-      field.setCustomValidity('Este campo é obrigatório.');
+      field.setCustomValidity('This field is required.');
     } else {
       field.setCustomValidity('');
     }

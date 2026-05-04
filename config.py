@@ -8,6 +8,8 @@ try:
 except ImportError:
     load_dotenv = None
 
+print("DEBUG: config.py is being imported", flush=True)
+
 # Optional import for AWS SSM on EC2/production
 def _import_boto3():
     try:
@@ -29,9 +31,23 @@ def _is_aws_host() -> bool:
 
 def _load_from_env() -> Dict[str, str]:
     # Local/dev: load .env if library available
+    print(f"DEBUG: CWD is {os.getcwd()}", flush=True)
     if load_dotenv:
-        load_dotenv()
-    return dict(os.environ)
+        # Search for .env in current directory and parent directory
+        dotenv_path = os.path.join(os.getcwd(), '.env')
+        if not os.path.exists(dotenv_path):
+            dotenv_path = os.path.join(os.getcwd(), '..', '.env')
+            
+        if os.path.exists(dotenv_path):
+            print(f"DEBUG: Loading .env from {os.path.abspath(dotenv_path)}", flush=True)
+            load_dotenv(dotenv_path, override=True) # Force override
+        else:
+            print("DEBUG: .env file not found in current or parent directory", flush=True)
+            load_dotenv() # Fallback to default
+            
+    res = dict(os.environ)
+    print(f"DEBUG: RCON_PASSWORD in os.environ: {'Yes' if 'RCON_PASSWORD' in res else 'No'}", flush=True)
+    return res
 
 def _load_from_ssm(prefix: str = f"/{APP_ENV}/") -> Dict[str, str]:
     boto3 = _import_boto3()
@@ -137,13 +153,15 @@ class Config:
     MYSQL_USER     = _get("MYSQL_USER", "admin")
     MYSQL_DBNAME   = _get("MYSQL_DBNAME", "explicolivais")
     MYSQL_PORT     = int(_get("MYSQL_PORT", "3306"))
-    # print(MYSQL_PASSWORD)
-    # print(MYSQL_HOST    )
-    # print(MYSQL_USER    )
-    # print(MYSQL_DBNAME  )
-    # print(MYSQL_PORT    )
-    # print()
 
+    # RCON Config
+    RCON_HOST = _get("RCON_HOST", "35.210.3.240")
+    RCON_PORT = int(_get("RCON_PORT", "25575"))
+    RCON_PASSWORD = _get("RCON_PASSWORD")
+
+    # GCP Config
+    GCP_INSTANCE_NAME = _get("GCP_INSTANCE_NAME", "mcserver-mem8")
+    GCP_ZONE = _get("GCP_ZONE", "europe-west1-b")
 
     DEBUG = False
     TESTING = False

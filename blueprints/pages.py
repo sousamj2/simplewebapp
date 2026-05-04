@@ -4,13 +4,19 @@ from markupsafe import Markup
 from pprint import pprint
 
 from simplewebapp.Funhelpers.render_profile_template import render_profile_template
+from simplewebapp.Funhelpers.mc_server_status import get_mc_status
 
 # Define a blueprint for each page
 bp_home = Blueprint('home', __name__, url_prefix='/')
 bp_calendar = Blueprint('calendar', __name__, url_prefix='/calendar')
 bp_adminDB = Blueprint('adminDB', __name__, url_prefix='/adminDB')
+bp_rules = Blueprint('rules', __name__, url_prefix='/rules')
+bp_commands = Blueprint('commands', __name__, url_prefix='/available_commands')
+bp_tiers = Blueprint('tiers', __name__, url_prefix='/tiers')
+bp_support = Blueprint('support', __name__, url_prefix='/support')
+bp_getting_started = Blueprint('getting_started', __name__, url_prefix='/getting-started')
 
-def render_page(blueprint, route="/", template_name="home", page_title="Explicações em Lisboa", title="Explicações em Lisboa", metadata=None):
+def render_page(blueprint, route="/", template_name="home", page_title="Mostly Jovial Crafters", title="Mostly Jovial Crafters", metadata=None):
     """
     A factory function to create and register a Flask view for rendering static pages.
 
@@ -24,18 +30,17 @@ def render_page(blueprint, route="/", template_name="home", page_title="Explica�
         template_name (str, optional): The name of the HTML template file (without the .html extension)
                                      located in the 'templates/content/' directory. Defaults to "home".
         page_title (str, optional): The title of the page, used in the <title> tag.
-                                    Defaults to "Explicações em Lisboa".
-        title (str, optional): The main title displayed on the page. Defaults to "Explicações em Lisboa".
+                                    Defaults to "Mostly Jovial Crafters".
+        title (str, optional): The main title displayed on the page. Defaults to "Mostly Jovial Crafters".
         metadata (dict, optional): A dictionary of metadata to pass to the template. Defaults to None.
 
     Returns:
         function: The created view function.
     """
+    if metadata is None:
+        metadata = {}
+        
     def view_func():
-        with open(f'templates/content/{template_name}.html', 'r', encoding='utf-8') as file:
-            main_content_html = Markup(file.read())
-        # user = session.get('user') or session.get('userinfo')
-        # pprint(user)
         user = session and session.get("metadata")
         if not user and template_name == "profile":
             return redirect(url_for('signin.signin'))
@@ -46,33 +51,35 @@ def render_page(blueprint, route="/", template_name="home", page_title="Explica�
               ) and template_name == "adminDB":
             return redirect(url_for('profile.profile'))
 
-        # print("metadata is:", session.get("metadata"))
-
-        # if route == "/profile":
-            # pprint("metadata is:", metadata)
         if not session.get("metadata") or not session.get("metadata").get('email') :
             user = None
-        # if template_name == "adminDB":
+
+        template_metadata = dict(metadata)
+        if template_name in ["home", "profile"]:
+            template_metadata["mc_status"] = get_mc_status()
 
         return render_template(
             'index.html',
             admin_email=current_app.config['ADMIN_EMAIL'],
             user=user,
-            metadata=metadata,
+            metadata=template_metadata,
             page_title=page_title,
             title=title,
-            main_content=main_content_html
+            content_template=f'content/{template_name}.html'
         )
     view_func.__name__ = f'view_func_{template_name.replace("-", "_").replace("/", "_")}'
     blueprint.route(route, methods=['GET'])(view_func)
     return view_func
 
 # Register each page route with its blueprint
-render_page(bp_home, route="/", template_name="home", page_title="Explicações em Lisboa", title="Explicações em Lisboa", metadata={})
-render_page(bp_calendar, route="/", template_name="calendar", page_title="Explicações em Lisboa", title="Explicações em Lisboa", metadata={})
-render_page(bp_adminDB, route="/", template_name="adminDB", page_title="Explicações em Lisboa", title="Explicações em Lisboa", metadata={})
-
-# render_page(pages_bp,route="/profile" , template_name="profile"  , page_title="Explicações em Lisboa", title="Explicações em Lisboa",metadata={session["metadata"]})
+render_page(bp_home, route="/", template_name="home", page_title="Mostly Jovial Crafters", title="Mostly Jovial Crafters", metadata={})
+render_page(bp_calendar, route="/", template_name="calendar", page_title="Mostly Jovial Crafters", title="Mostly Jovial Crafters", metadata={})
+render_page(bp_adminDB, route="/", template_name="adminDB", page_title="Mostly Jovial Crafters", title="Mostly Jovial Crafters", metadata={})
+render_page(bp_rules, route="/", template_name="rules", page_title="Rules", title="Rules", metadata={})
+render_page(bp_commands, route="/", template_name="available_commands", page_title="Commands", title="Commands", metadata={})
+render_page(bp_tiers, route="/", template_name="tiers", page_title="Tiers", title="Tiers", metadata={})
+render_page(bp_support, route="/", template_name="support", page_title="Support", title="Support", metadata={})
+render_page(bp_getting_started, route="/", template_name="getting_started", page_title="Getting Started", title="Getting Started", metadata={})
 # render_page(pages_bp,route="/signin"  , template_name="signin"   , page_title="Explicações em Lisboa", title="Explicações em Lisboa",metadata={})
 # render_page(pages_bp,route="/signup"  , template_name="signup"   , page_title="Explicações em Lisboa", title="Explicações em Lisboa",metadata={})
 # render_page(pages_bp,route="/logout"  , template_name="logout"   , page_title="Explicações em Lisboa", title="Explicações em Lisboa",metadata={})

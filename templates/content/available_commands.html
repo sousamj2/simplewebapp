@@ -1,0 +1,172 @@
+<div class="page-content">
+    <h1 class="page-title">Server Guide</h1>
+    <p class="page-subtitle">Everything you need to know about how <strong>Mostly Jovial Crafters</strong> works in-game.</p>
+
+    <!-- Economy -->
+    <div class="accordion-item card">
+        <button class="accordion-btn" aria-expanded="false">
+            <span>💰 Economy</span><span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-body">
+            <p>Everyone starts with <strong>€0</strong>. Money is earned by:</p>
+            <ul class="rule-list">
+                <li>Selling items to other players via QuickShop</li>
+                <li>Selling <strong>diamonds</strong> to the bank — each diamond is worth <strong>€1,000</strong></li>
+                <li>Selling a <strong>diamond block</strong> (9 diamonds) earns <strong>€10,000</strong></li>
+            </ul>
+            <p>You can buy diamonds back from the bank at a 20% premium: <strong>€1,200 each</strong>. The entire economy is diamond-based.</p>
+
+            <h3>TVA (Tax)</h3>
+            <p>A progressive tax applies to all shop purchases (except the bank), based on your current balance:</p>
+            <table class="info-table">
+                <thead><tr><th>Balance</th><th>Tax Rate</th></tr></thead>
+                <tbody>
+                    <tr><td>Up to €5,000</td><td>0%</td></tr>
+                    <tr><td>€5,000 – €10,000</td><td>1%</td></tr>
+                    <tr><td>€10k – €50k</td><td>2%</td></tr>
+                    <tr><td>€50k – €250k</td><td>3%</td></tr>
+                    <tr><td>€250k – €1M</td><td>5%</td></tr>
+                    <tr><td>€1M – €5M</td><td>8%</td></tr>
+                    <tr><td>€5M+</td><td>12%</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- World -->
+    <div class="accordion-item card">
+        <button class="accordion-btn" aria-expanded="false">
+            <span>🌍 World & Map</span><span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-body">
+            <h3>World Border</h3>
+            <p>The overworld border is a <strong>circle centred at (0,0)</strong> starting at radius 2,000 blocks. It expands with distance travelled by all players up to a maximum radius of <strong>6,000 blocks</strong> (all chunks have been pre-generated).</p>
+            <ul class="rule-list">
+                <li><strong>Nether:</strong> chunks generated up to 1,000 block radius</li>
+                <li><strong>End:</strong> chunks generated up to 6,000 block radius</li>
+            </ul>
+            <p>💡 <em>Tip:</em> In the nether, use MiniHUD to draw a cylinder at (0,0) with radius = overworld border ÷ 8. This ensures portals back to the overworld land within bounds. Portals created beyond the world border will snap to the edge.</p>
+
+            <h3>BlueMap</h3>
+            <p>A live 3D map of the server is available at <a href="https://map.mjcrafts.pt" target="_blank">map.mjcrafts.pt</a>.</p>
+            <p>Use the <strong>EasyBMSignMarkers</strong> plugin to add markers on the map with in-game signs:</p>
+            <ul class="rule-list">
+                <li>Line 1: <code>[marker_icon_name]</code></li>
+                <li>Lines 2–4: custom text</li>
+            </ul>
+            <p>See the <a href="https://github.com/deimiczny/easy-bmapmarkers/blob/main/README.md" target="_blank">official wiki</a> for icon names.</p>
+        </div>
+    </div>
+
+    <!-- PvP -->
+    <div class="accordion-item card">
+        <button class="accordion-btn" aria-expanded="false">
+            <span>⚔️ PvP (PVPManager)</span><span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-body">
+            <p>PvP is <strong>opt-in</strong> and off by default. Use <code>/pvp toggle</code> (or <code>/pvp t</code>) to switch.</p>
+            <p>All new players start with a <strong>15-minute PvP protection timer</strong>.</p>
+            <h3>Rules while in combat:</h3>
+            <ul class="rule-list">
+                <li>You cannot toggle PvP off</li>
+                <li>You cannot enter claimed land or spawn</li>
+                <li>You cannot teleport (<code>/spawn</code>, <code>/home</code>)</li>
+                <li>Logging out drops all items and XP (vanilla death rules)</li>
+            </ul>
+            <h3>Weekly Events</h3>
+            <p>Twice a week, a server-wide PvP event is held where PvP is enabled for all players. You are only safe inside <strong>spawn</strong> or on <strong>claimed land</strong>. An arena for consensual fights is also planned.</p>
+        </div>
+    </div>
+
+    <!-- Land Claims -->
+    <div class="accordion-item card">
+        <button class="accordion-btn" aria-expanded="false">
+            <span>🏡 Land Claims (GriefPrevention)</span><span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-body">
+            <p>Land is claimed using a <strong>golden shovel</strong>. Use <code>/kit tool</code> every 15 minutes to receive one (with 0 durability — it's just for claiming).</p>
+            <ul class="rule-list">
+                <li>Placing your <strong>first chest</strong> creates an automatic 5×5 claim</li>
+                <li>This auto-claim expires after <strong>7 days</strong> unless expanded to at least 10×10</li>
+                <li>Left-click two opposite corners with the shovel to define or resize a claim</li>
+                <li>Claims extend from the <strong>top of the world down 5 blocks</strong> (never below Y=-51)</li>
+                <li>Below Y=-52 (diamond level) is <strong>unclaimed territory</strong> — fair game for tunnels</li>
+                <li>Claims are forfeited after <strong>60 days of inactivity</strong></li>
+            </ul>
+            <h3>Nether Claims</h3>
+            <p>Claim land in the nether only <strong>above the roof (Y &gt; 130)</strong>. For blaze farms below the roof, request a claim in Discord — no questions asked. You are required to either sell blaze rods for profit or make the farm public.</p>
+            <h3>Claim Blocks</h3>
+            <p>You start with <strong>100 claim blocks</strong>. Earn more by playing — see the <a href="{{ url_for('tiers.view_func_tiers') }}">Ranks page</a> for multipliers.</p>
+            <p>📖 Full docs: <a href="https://docs.griefprevention.com/" target="_blank">docs.griefprevention.com</a></p>
+        </div>
+    </div>
+
+    <!-- QuickShop -->
+    <div class="accordion-item card">
+        <button class="accordion-btn" aria-expanded="false">
+            <span>🏪 Player Shops (QuickShop-Hikari)</span><span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-body">
+            <h3>For shop owners:</h3>
+            <ol class="rule-list">
+                <li>Place a chest in your shop area</li>
+                <li>Hold the item you want to sell. Type <code>/qs create [price]</code></li>
+                <li>The quantity sold matches what you're holding (64 dirt = sell a stack, 1 dirt = sell one)</li>
+                <li>Switch between buy/sell mode: <code>/qs buy</code> or <code>/qs sell</code></li>
+                <li>Change the item: <code>/qs item</code></li>
+                <li>Change the price: <code>/qs price &lt;amount&gt;</code> — costs a €20 fee</li>
+                <li>Creating a shop costs <strong>€10</strong></li>
+                <li>Stock items directly in the chest — customers pay immediately when buying</li>
+                <li>Shops are purged if inactive for <strong>60 days</strong></li>
+            </ol>
+            <h3>For customers:</h3>
+            <ol class="rule-list">
+                <li>Walk up to a shop chest and click it</li>
+                <li>The chat will show item info and price</li>
+                <li>Type how many you want to buy or sell in chat. If the shop shows "64x", you're paying for a full stack</li>
+                <li>Find nearby shops: <code>/qs find &lt;item_name&gt;</code> (within 100 blocks)</li>
+                <li>Item names use Minecraft IDs, e.g. <code>oak_hanging_sign</code>. See <a href="https://minecraft.wiki/" target="_blank">minecraft.wiki</a></li>
+            </ol>
+            <p>📖 Full docs: <a href="https://modrinth.com/plugin/quickshop-hikari" target="_blank">QuickShop-Hikari on Modrinth</a></p>
+        </div>
+    </div>
+
+    <!-- Mods & Compatibility -->
+    <div class="accordion-item card">
+        <button class="accordion-btn" aria-expanded="false">
+            <span>🔧 Mods & Compatibility</span><span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-body">
+            <h3>ViaVersion / ViaBackwards</h3>
+            <p>The server runs on the latest version but supports players joining from <strong>Minecraft 1.18 and above</strong>.</p>
+            <h3>CustomCraft — Extra Recipes</h3>
+            <p>The following items can be crafted with custom recipes:</p>
+            <table class="info-table">
+                <thead><tr><th>Item</th><th>Recipe</th></tr></thead>
+                <tbody>
+                    <tr><td>Name Tag</td><td>1 Paper + 1 Iron or Gold Nugget</td></tr>
+                    <tr><td>Bundle</td><td>1 String + 1 Leather (dyeable)</td></tr>
+                    <tr><td>Lodestone</td><td>8 Chiseled Stone Bricks + Iron Ingot (centre)</td></tr>
+                    <tr><td>Lead</td><td>5 Strings (instead of 4 String + Slime Ball)</td></tr>
+                    <tr><td>Saddle</td><td>3 Leather + 1 Iron Ingot</td></tr>
+                </tbody>
+            </table>
+            <h3>Simple Score HUD</h3>
+            <p>A scoreboard showing your money, claims (used/available), rank, ping, and PvP status. Toggle with <code>/simplescore toggle</code>.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+document.querySelectorAll('.accordion-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const item = btn.parentElement;
+        const body = item.querySelector('.accordion-body');
+        const icon = btn.querySelector('.accordion-icon');
+        const isOpen = btn.getAttribute('aria-expanded') === 'true';
+        btn.setAttribute('aria-expanded', !isOpen);
+        body.style.maxHeight = isOpen ? '0' : body.scrollHeight + 'px';
+        icon.textContent = isOpen ? '+' : '−';
+    });
+});
+</script>

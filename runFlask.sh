@@ -11,7 +11,10 @@ NC='\033[0m' # No Color
 
 echo -e "   🚀 Creating tables if they don't exist"
 
-../app-env/bin/python -c "import os;\
+# Get absolute path to the virtual environment
+VENV_PATH=$(realpath ../app-env)
+
+$VENV_PATH/bin/python -c "import os;\
 import sys;\
 sys.path.insert(0, os.path.abspath(os.path.join(os.getcwd(), '..')));\
 sys.path.insert(0, os.path.abspath(os.path.join(os.getcwd(), '../mysql')));\
@@ -41,4 +44,4 @@ echo -e "${RED}Press Ctrl+C to stop${NC}"
 echo ""
 
 # Start Flask
-../app-env/bin/flask run --host=localhost --port=8080
+$VENV_PATH/bin/flask run --host=localhost --port=8080

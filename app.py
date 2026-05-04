@@ -14,12 +14,13 @@ load_dotenv()
 from mailinteraction import mail
 from authenticate import (
     bp_check_user, bp_logout, bp_oauth2callback, bp_signin, 
-    bp_signup, bp_signin_redirect, bp_updateDB
+    bp_signup, bp_signin_redirect, bp_updateDB, bp_server_actions
 )
 from mailinteraction import bp_register, bp_request_new_user
 from blueprints import (
     bp_home, bp_profile, 
-    bp_calendar, bp_adminDB
+    bp_calendar, bp_adminDB,
+    bp_rules, bp_commands, bp_tiers, bp_support, bp_getting_started
 )
 
 
@@ -61,6 +62,12 @@ def create_app(config_name=None):
     app.register_blueprint(bp_calendar)
     app.register_blueprint(bp_adminDB)
     app.register_blueprint(bp_updateDB)
+    app.register_blueprint(bp_server_actions)
+    app.register_blueprint(bp_rules)
+    app.register_blueprint(bp_commands)
+    app.register_blueprint(bp_tiers)
+    app.register_blueprint(bp_support)
+    app.register_blueprint(bp_getting_started)
     
     
     # Main route: redirect to /pages/ (home)

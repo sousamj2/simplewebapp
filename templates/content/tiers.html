@@ -1,0 +1,84 @@
+<div class="page-content">
+    <h1 class="page-title">Ranks & Pricing</h1>
+    <p class="page-subtitle">Choose the rank that suits your playstyle.</p>
+
+    <div class="card">
+        <h2>Rank Comparison</h2>
+        <div class="table-scroll">
+        <table class="rank-table">
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th class="rank-col">No Rank</th>
+                    <th class="rank-col rank-highlight">⭐ Player<br><small>Rank 1</small></th>
+                    <th class="rank-col">BP<br><small>Rank 2</small></th>
+                    <th class="rank-col">VIP<br><small>Rank 3</small></th>
+                    <th class="rank-col">MVP<br><small>Rank 4</small></th>
+                    <th class="rank-col rank-patreon">PATREON<br><small>Rank 5</small></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Monthly Price</td><td>Free</td><td class="rank-highlight">€1/mo</td><td>€4/mo</td><td>€11/mo</td><td>€21/mo</td><td class="rank-patreon">€101 once</td></tr>
+                <tr><td>Homes</td><td>None</td><td class="rank-highlight">Bed only</td><td>Bed + 1</td><td>Bed + 3</td><td>Bed + 5</td><td class="rank-patreon">Bed + 10</td></tr>
+                <tr><td>Max Shops</td><td>10 (town hall)</td><td class="rank-highlight">20</td><td>40</td><td>60</td><td>100</td><td class="rank-patreon">150</td></tr>
+                <tr><td>Claims Multiplier</td><td>0.9×</td><td class="rank-highlight">1×</td><td>1.2×</td><td>1.5×</td><td>2×</td><td class="rank-patreon">2.5×</td></tr>
+                <tr><td>Own shop in district</td><td>❌</td><td class="rank-highlight">✅</td><td>✅</td><td>✅</td><td>✅</td><td class="rank-patreon">✅</td></tr>
+                <tr><td><code>/home bed</code></td><td>❌</td><td class="rank-highlight">✅</td><td>✅</td><td>✅</td><td>✅</td><td class="rank-patreon">✅</td></tr>
+                <tr><td><code>/sethome</code></td><td>❌</td><td class="rank-highlight">❌</td><td>✅</td><td>✅</td><td>✅</td><td class="rank-patreon">✅</td></tr>
+                <tr><td>Named homes (<code>/sethome &lt;name&gt;</code>)</td><td>❌</td><td class="rank-highlight">❌</td><td>❌</td><td>✅</td><td>✅</td><td class="rank-patreon">✅</td></tr>
+                <tr><td>Server setup access</td><td>❌</td><td class="rank-highlight">❌</td><td>❌</td><td>❌</td><td>❌</td><td class="rank-patreon">✅</td></tr>
+            </tbody>
+        </table>
+        </div>
+        <p class="rank-note">💡 <strong>Rank 1 (Player)</strong> is the rank the admin plays at — a full, balanced experience.</p>
+        <p class="rank-note">💡 A <strong>€1 discount</strong> applies to Ranks 2–5 if you follow the server startup procedure via the portal.</p>
+        <p class="rank-note">💡 <strong>No Rank</strong> players can still use 10 shops in the town hall with a 0.9× multiplier.</p>
+    </div>
+
+    <div class="accordion-item card">
+        <button class="accordion-btn" aria-expanded="false">
+            <span>📋 Base Commands (all ranks)</span><span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-body">
+            <table class="info-table">
+                <thead><tr><th>Command</th><th>Description</th></tr></thead>
+                <tbody>
+                    <tr><td><code>/kit tool</code></td><td>Golden shovel for land claims (every 15 min)</td></tr>
+                    <tr><td><code>/pvp toggle</code></td><td>Toggle PvP on/off</td></tr>
+                    <tr><td><code>/spawn</code></td><td>Teleport to spawn (every 15 min)</td></tr>
+                    <tr><td><code>/qs create [price]</code></td><td>Create a shop</td></tr>
+                    <tr><td><code>/qs buy</code> / <code>/qs sell</code></td><td>Switch shop mode</td></tr>
+                    <tr><td><code>/qs item</code></td><td>Change traded item</td></tr>
+                    <tr><td><code>/qs price &lt;amount&gt;</code></td><td>Update price (costs €20)</td></tr>
+                    <tr><td><code>/qs find &lt;item&gt;</code></td><td>Locate nearby shops</td></tr>
+                    <tr><td><code>/simplescore toggle</code></td><td>Show/hide HUD scoreboard</td></tr>
+                    <tr><td><code>/abandonclaim</code></td><td>Remove the claim you're standing on</td></tr>
+                    <tr><td><code>/abandonallclaims</code></td><td>Remove all your claims</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card payment-card">
+        <h2>💳 How to Pay</h2>
+        <p>Payments are made via <strong>Buy Me a Coffee</strong>. Please include your <strong>Minecraft username</strong> so the correct rank can be assigned.</p>
+        <a href="https://www.buymeacoffee.com/mjcrafts" target="_blank" class="btn btn--primary">☕ Pay via Buy Me a Coffee</a>
+        <div class="payment-info">
+            <p>After your first login, you are automatically placed at <strong>No Rank</strong>. After payment is received, your rank will be updated within <strong>1–2 days</strong>.</p>
+            <p>A <strong>PATREON</strong> sponsorship would allow a 24/7 server (~€150/year), removing the need to start the server manually.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+document.querySelectorAll('.accordion-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const body = btn.parentElement.querySelector('.accordion-body');
+        const icon = btn.querySelector('.accordion-icon');
+        const isOpen = btn.getAttribute('aria-expanded') === 'true';
+        btn.setAttribute('aria-expanded', !isOpen);
+        body.style.maxHeight = isOpen ? '0' : body.scrollHeight + 'px';
+        icon.textContent = isOpen ? '+' : '−';
+    });
+});
+</script>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="en-GB">
 
 <head>
     <meta charset="UTF-8">
@@ -7,75 +7,48 @@
     <title>{{ page_title }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/theme-switcher.css') }}">
-
-    
-    <!-- KaTeX for math rendering -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            renderMathInElement(document.body, {
-                delimiters: [
-                    { left: "\\(", right: "\\)", display: false },
-                    { left: "\\[", right: "\\]", display: true }
-                ],
-                throwOnError: false
-            });
-        });
-    </script>
-
-<!-- NEW: MathJax for dynamic/answer content -->
-<script>
-  window.MathJax = {
-    tex: {
-      inlineMath: [['\\(', '\\)']],
-      displayMath: [['\\[', '\\]']]
-    },
-    options: {
-      skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-      processHtmlClass: 'mathjax-process'
-    }
-  };
-</script>
-<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-
-  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
 
 </head>
-
-<body>
-    <div class="container">
-        <div class="title-box">
-            <h1>{{ title }}</h1>
-        </div>
-        <div class="columns">
-            <nav class="menu">
-                <ul>
-                    {% if session is defined and session['metadata'] is defined and session['metadata']['email'] is defined and session['metadata']['email'] == admin_email %}
-                    {% include 'content/menu-admin.html' %}
-                    {% elif user %}
-                    {% include 'content/menu-profile.html' %}
-                    {% elif metadata is defined and metadata['email'] is defined %}
-                    {% include 'content/menu-profile.html' %}
-                    {% else %}
-                    {% include 'content/menu.html' %}
-                    {% endif %}
-                </ul>
-            </nav>
-            <main class="main-content">
-                {{ main_content | safe }}
-            </main>
-        </div>
-    </div>
-    <footer>
-    <p>  EXPLICACOESLISBOA.PT &copy; 2025 - Mário Sousa</p>
-    </footer>
+ 
+ <body>
+     <div class="container">
+         <div class="columns">
+             <nav class="menu">
+                 {% if session is defined and session['metadata'] is defined %}
+                 <div class="menu-header">
+                     <span class="menu-user-name">{{ session['metadata'].get('full_name', 'Player') }}</span>
+                 </div>
+                 {% endif %}
+                 <ul>
+                     {% if session is defined and session['metadata'] is defined and session['metadata']['email'] is defined and session['metadata']['email'] == admin_email %}
+                     {% include 'content/menu-admin.html' %}
+                     {% elif user %}
+                     {% include 'content/menu-profile.html' %}
+                     {% elif metadata is defined and metadata['email'] is defined %}
+                     {% include 'content/menu-profile.html' %}
+                     {% else %}
+                     {% include 'content/menu.html' %}
+                     {% endif %}
+                 </ul>
+             </nav>
+             <main class="main-content">
+                 {% if content_template %}
+                     {% include content_template %}
+                 {% else %}
+                     {{ main_content | safe }}
+                 {% endif %}
+             </main>
+         </div>
+     </div>
+     <footer>
+     <p>MJCRAFTS.PT &copy; 2026 - Mário Sousa</p>
+     </footer>
 
     <div class="theme-switcher">
-        <button class="theme-btn" data-theme="light" data-icon="☀️" title="Modo Claro"></button>
-        <button class="theme-btn" data-theme="dark" data-icon="🌙" title="Modo Escuro"></button>
-        <button class="theme-btn active" data-theme="system" data-icon="💻" title="Sistema"></button>
+        <button class="theme-btn" data-theme="light" data-icon="☀️" title="Light Mode"></button>
+        <button class="theme-btn" data-theme="dark" data-icon="🌙" title="Dark Mode"></button>
+        <button class="theme-btn active" data-theme="system" data-icon="💻" title="System"></button>
     </div>
 
     <script>
