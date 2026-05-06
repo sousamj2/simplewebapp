@@ -34,6 +34,7 @@ export FLASK_DEBUG=1
 
 echo -e "${YELLOW}📍 Access URLs:${NC}"
 echo -e "   Local:  http://localhost:8080"
+echo -e "   Local:  https://mc.mjcrafts.pt"
 echo ""
 echo -e "${YELLOW}💡 Features enabled:${NC}"
 echo -e "   ✅ Auto-reload on file changes"
@@ -44,4 +45,5 @@ echo -e "${RED}Press Ctrl+C to stop${NC}"
 echo ""
 
 # Start Flask
-$VENV_PATH/bin/flask run --host=localhost --port=8080
+# $VENV_PATH/bin/flask run --host=localhost --port=8080
+$VENV_PATH/bin/flask run --host=0.0.0.0 --port=8081

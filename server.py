@@ -38,15 +38,15 @@ if __name__ == '__main__':
     )
     
     # 4. Start the Production Server
-    port = 8080
+    port = 8081
     print(f"🚀 Starting Waitress Production Server on port {port}...")
-    print(f"📍 Access URL: http://0.0.0.0:{port}")
+    print(f"📍 Access URL: http://mc.mjcrafts.pt")
     print(f"📍 Access URL: http://localhost:{port}")
     
     serve(
         app, 
-        # host='0.0.0.0', 
-        host='localhost', 
+        host='0.0.0.0', 
+        # host='localhost', 
         port=port, 
         threads=8, 
         channel_timeout=120, 
