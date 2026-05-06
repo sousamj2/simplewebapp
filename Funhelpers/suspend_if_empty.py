@@ -51,7 +51,30 @@ def main():
     players_online = int(status.get('players_online', 0) or 0)
     should_suspend = online and players_online == 0
     action = None
+    cleanup = None
+
     if should_suspend:
+        cleanup_cmd = [
+            'gcloud', 'compute', 'ssh', args.instance,
+            f'--zone={args.zone}',
+            "--command=sudo rm -vf /home/minecraft/cronjobs/usecache_*.json",
+        ]
+        if args.project:
+            cleanup_cmd.append(f'--project={args.project}')
+
+        if args.dry_run:
+            cleanup = {'ok': True, 'dry_run': True, 'command': cleanup_cmd}
+        else:
+            cleanup_proc = subprocess.run(cleanup_cmd, capture_output=True, text=True, timeout=120)
+            cleanup = {
+                'ok': cleanup_proc.returncode == 0,
+                'dry_run': False,
+                'command': cleanup_cmd,
+                'stdout': (cleanup_proc.stdout or '').strip(),
+                'stderr': (cleanup_proc.stderr or '').strip(),
+                'returncode': cleanup_proc.returncode,
+            }
+
         action = run_gcloud_suspend(args.instance, args.zone, args.project, args.dry_run)
 
     result = {
