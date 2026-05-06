@@ -53,6 +53,20 @@ def main():
     action = None
     cleanup = None
 
+    check_cmd = [
+        'gcloud', 'compute', 'ssh', args.instance,
+        f'--zone={args.zone}',
+        "--command=test -f /home/minecraft/cronjobs/usecache_0.json && test -f /home/minecraft/cronjobs/usecache_5.json",
+    ]
+    if args.project:
+        check_cmd.append(f'--project={args.project}')
+
+    check_proc = subprocess.run(check_cmd, capture_output=True, text=True, timeout=120)
+    cache_files_ready = check_proc.returncode == 0
+
+    if not cache_files_ready:
+        should_suspend = False
+
     if should_suspend:
         cleanup_cmd = [
             'gcloud', 'compute', 'ssh', args.instance,
