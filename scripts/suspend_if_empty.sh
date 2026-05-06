@@ -7,4 +7,4 @@ PATH=/usr/local/bin:/usr/bin:/bin
   --zone europe-west1-b \
   --state-file /var/www/appmodules/simplewebapp/scripts/suspend_if_empty_state.json \
   --summary \
-  >> /var/www/appmodules/simplewebapp/scripts/suspend_if_empty.log 2>&1
+  > /var/www/appmodules/simplewebapp/scripts/suspend_if_empty.log 2>&1
