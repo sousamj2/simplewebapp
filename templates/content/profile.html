@@ -29,6 +29,9 @@
                 {% if metadata.mc_status.online %}
                     <p class="status-online">ONLINE</p>
                     <p>Players: {{ metadata.mc_status.players_online }} / {{ metadata.mc_status.players_max }}</p>
+                    {% if metadata.mc_status.motd %}
+                        <p class="motd">{{ metadata.mc_status.motd | mc_colors }}</p>
+                    {% endif %}
                 {% else %}
                     <p class="status-offline">OFFLINE</p>
                     {% if session.get('waiting_for_resume_code') %}

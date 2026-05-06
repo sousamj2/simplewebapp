@@ -22,6 +22,7 @@ from blueprints import (
     bp_calendar, bp_adminDB,
     bp_rules, bp_commands, bp_tiers, bp_support, bp_getting_started
 )
+from Funhelpers.mc_colors import mc_to_html
 
 
 
@@ -43,6 +44,9 @@ def create_app(config_name=None):
     # Initialize Flask-Mail via the extension pattern to avoid assigning new attributes on Flask
     mail.init_app(app)
     # print("Mail state after init_app:", mail.state)
+    
+    # Register Jinja filters
+    app.jinja_env.filters['mc_colors'] = mc_to_html
     
     # Favicon route
     @app.route('/favicon.ico')
