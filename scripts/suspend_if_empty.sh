@@ -5,6 +5,7 @@ PATH=/usr/local/bin:/usr/bin:/bin
 /var/www/appmodules/app-env/bin/python /var/www/appmodules/simplewebapp/Funhelpers/suspend_if_empty.py \
   --instance mcserver-mem8 \
   --zone europe-west1-b \
+  --archive-script /home/minecraft/cronjobs/archive_cronjobs.sh \
   --state-file /var/www/appmodules/simplewebapp/scripts/suspend_if_empty_state.json \
   --summary \
   > /var/www/appmodules/simplewebapp/scripts/suspend_if_empty.log 2>&1

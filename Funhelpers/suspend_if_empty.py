@@ -11,15 +11,13 @@ from mc_server_status import get_mc_status
 STATE_FILE = Path('/var/www/appmodules/simplewebapp/scripts/suspend_if_empty_state.json')
 INSTANCE_NAME = 'mcserver-mem8'
 ZONE = 'europe-west1-b'
+REMOTE_ARCHIVE_SCRIPT = '/home/minecraft/cronjobs/archive_cronjobs.sh'
 
 
-def run_gcloud_suspend(instance: str, zone: str, project: str | None, dry_run: bool):
-    cmd = ['gcloud', 'compute', 'instances', 'suspend', instance, f'--zone={zone}']
-    if project:
-        cmd.append(f'--project={project}')
+def run_command(cmd, dry_run=False, timeout=120):
     if dry_run:
         return {'ok': True, 'dry_run': True, 'command': cmd, 'stdout': '', 'stderr': ''}
-    proc = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+    proc = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
     return {
         'ok': proc.returncode == 0,
         'dry_run': False,
@@ -28,6 +26,20 @@ def run_gcloud_suspend(instance: str, zone: str, project: str | None, dry_run: b
         'stderr': (proc.stderr or '').strip(),
         'returncode': proc.returncode,
     }
+
+
+def gcloud_ssh_command(instance: str, zone: str, remote_command: str, project: str | None):
+    cmd = ['gcloud', 'compute', 'ssh', instance, f'--zone={zone}', f'--command={remote_command}']
+    if project:
+        cmd.append(f'--project={project}')
+    return cmd
+
+
+def run_gcloud_suspend(instance: str, zone: str, project: str | None, dry_run: bool):
+    cmd = ['gcloud', 'compute', 'instances', 'suspend', instance, f'--zone={zone}']
+    if project:
+        cmd.append(f'--project={project}')
+    return run_command(cmd, dry_run=dry_run)
 
 
 def save_json(path: Path, data):
@@ -41,6 +53,7 @@ def main():
     parser.add_argument('--zone', default=ZONE)
     parser.add_argument('--project', default=None)
     parser.add_argument('--state-file', default=str(STATE_FILE))
+    parser.add_argument('--archive-script', default=REMOTE_ARCHIVE_SCRIPT)
     parser.add_argument('--dry-run', action='store_true')
     parser.add_argument('--summary', action='store_true')
     args = parser.parse_args()
@@ -50,46 +63,42 @@ def main():
     online = bool(status.get('online'))
     players_online = int(status.get('players_online', 0) or 0)
     should_suspend = online and players_online == 0
-    action = None
-    cleanup = None
 
-    check_cmd = [
-        'gcloud', 'compute', 'ssh', args.instance,
-        f'--zone={args.zone}',
-        "--command=test -f /home/minecraft/cronjobs/usecache_0.json && test -f /home/minecraft/cronjobs/usecache_5.json",
-    ]
-    if args.project:
-        check_cmd.append(f'--project={args.project}')
-
-    check_proc = subprocess.run(check_cmd, capture_output=True, text=True, timeout=120)
-    cache_files_ready = check_proc.returncode == 0
-
+    check_cmd = gcloud_ssh_command(
+        args.instance,
+        args.zone,
+        'test -f /home/minecraft/cronjobs/usecache_0.json && test -f /home/minecraft/cronjobs/usecache_5.json',
+        args.project,
+    )
+    check_result = run_command(check_cmd, dry_run=False)
+    cache_files_ready = check_result.get('ok', False)
     if not cache_files_ready:
         should_suspend = False
 
+    archive_result = None
+    cleanup_result = None
+    action = None
+
     if should_suspend:
-        cleanup_cmd = [
-            'gcloud', 'compute', 'ssh', args.instance,
-            f'--zone={args.zone}',
-            "--command=sudo rm -vf /home/minecraft/cronjobs/usecache_*.json",
-        ]
-        if args.project:
-            cleanup_cmd.append(f'--project={args.project}')
+        archive_cmd = gcloud_ssh_command(
+            args.instance,
+            args.zone,
+            f'bash {args.archive_script}',
+            args.project,
+        )
+        archive_result = run_command(archive_cmd, dry_run=args.dry_run)
 
-        if args.dry_run:
-            cleanup = {'ok': True, 'dry_run': True, 'command': cleanup_cmd}
-        else:
-            cleanup_proc = subprocess.run(cleanup_cmd, capture_output=True, text=True, timeout=120)
-            cleanup = {
-                'ok': cleanup_proc.returncode == 0,
-                'dry_run': False,
-                'command': cleanup_cmd,
-                'stdout': (cleanup_proc.stdout or '').strip(),
-                'stderr': (cleanup_proc.stderr or '').strip(),
-                'returncode': cleanup_proc.returncode,
-            }
+        if archive_result.get('ok', False):
+            cleanup_cmd = gcloud_ssh_command(
+                args.instance,
+                args.zone,
+                'sudo rm -vf /home/minecraft/cronjobs/usecache_*.json',
+                args.project,
+            )
+            cleanup_result = run_command(cleanup_cmd, dry_run=args.dry_run)
 
-        action = run_gcloud_suspend(args.instance, args.zone, args.project, args.dry_run)
+            if cleanup_result.get('ok', False):
+                action = run_gcloud_suspend(args.instance, args.zone, args.project, args.dry_run)
 
     result = {
         'measured_at': measured_at,
@@ -97,9 +106,14 @@ def main():
         'online': online,
         'players_online': players_online,
         'should_suspend': should_suspend,
+        'cache_files_ready': cache_files_ready,
+        'cache_check': check_result,
         'instance': args.instance,
         'zone': args.zone,
         'project': args.project,
+        'archive_script': args.archive_script,
+        'archive': archive_result,
+        'cleanup': cleanup_result,
         'action': action,
     }
     save_json(Path(args.state_file), result)
@@ -109,7 +123,7 @@ def main():
     else:
         print(json.dumps(result, indent=2, sort_keys=True))
 
-    if action and not action.get('ok', False):
+    if any(step and not step.get('ok', False) for step in [archive_result, cleanup_result, action]):
         sys.exit(1)
 
 
