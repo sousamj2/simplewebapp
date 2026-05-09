@@ -19,6 +19,7 @@
                 <p><small>UUID: <code>{{ player_uuid }}</code></small></p>
             {% endif %}
             <p>Your last login was at {{lastlogin}}</p>
+            <p>Your last online in MC was: <strong>{{ last_online_display }}</strong></p>
         </div>
     </div>
 
@@ -29,9 +30,6 @@
                 {% if metadata.mc_status.online %}
                     <p class="status-online">ONLINE</p>
                     <p>Players: {{ metadata.mc_status.players_online }} / {{ metadata.mc_status.players_max }}</p>
-                    {% if metadata.mc_status.motd %}
-                        <p class="motd">{{ metadata.mc_status.motd | mc_colors }}</p>
-                    {% endif %}
                 {% else %}
                     <p class="status-offline">OFFLINE</p>
                     {% if session.get('waiting_for_resume_code') %}

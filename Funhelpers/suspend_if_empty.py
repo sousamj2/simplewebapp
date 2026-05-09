@@ -7,6 +7,18 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from mc_server_status import get_mc_status
+from mc_rcon import run_rcon_command
+
+# Add app modules to path for DB helpers
+script_dir = Path(__file__).parent
+app_root = script_dir.parent.parent
+if str(app_root) not in sys.path:
+    sys.path.insert(0, str(app_root))
+if str(script_dir.parent) not in sys.path:
+    sys.path.insert(0, str(script_dir.parent))
+
+from mysql.DBhelpers import update_mc_stats, getEmailFromIgn
+from simplewebapp.app import create_app
 
 STATE_FILE = Path('/var/www/appmodules/simplewebapp/scripts/suspend_if_empty_state.json')
 INSTANCE_NAME = 'mcserver-mem8'
@@ -53,6 +65,59 @@ def get_instance_status(instance: str, zone: str, project: str | None):
 def save_json(path: Path, data):
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, indent=2, sort_keys=True), encoding='utf-8')
+
+
+def shutdown_minecraft(instance: str, zone: str, project: str | None, dry_run: bool):
+    """
+    Saves the world and stops the Minecraft server gracefully.
+    """
+    print("Requesting server save...")
+    run_rcon_command("save-all")
+    print("Requesting server stop...")
+    run_rcon_command("stop")
+    
+    # Also ensure systemd service is stopped
+    stop_svc_cmd = gcloud_ssh_command(instance, zone, "sudo systemctl stop mcpserver.service", project)
+    return run_command(stop_svc_cmd, dry_run=dry_run)
+
+
+def sync_cache_to_db(instance: str, zone: str, project: str | None, app):
+    """
+    Reads usecache_0.json from the remote server and updates the local DB.
+    """
+    cat_cmd = gcloud_ssh_command(instance, zone, "cat /home/minecraft/cronjobs/usecache_0.json", project)
+    res = run_command(cat_cmd)
+    if not res.get('ok'):
+        print(f"Failed to read remote cache: {res.get('stderr')}")
+        return
+    
+    try:
+        cache = json.loads(res.get('stdout', '{}'))
+        with app.app_context():
+            for uuid, data in cache.items():
+                ign = data.get('player')
+                if not ign:
+                    continue
+                
+                email = getEmailFromIgn(ign)
+                if not email:
+                    continue
+                
+                # Fetch more stats via RCON if possible, but here we likely only have what's in JSON
+                # The user wants to update the DB with _0 file info.
+                last_online = data.get('measured_at')
+                # If they were in the cache, they were online recently.
+                update_mc_stats(
+                    email,
+                    uuid,
+                    data.get('rank', 'NR'),
+                    "NA", # bank not in usecache JSON usually
+                    "NA", # claims not in usecache JSON usually
+                    last_online
+                )
+        print("Database sync from cache completed.")
+    except Exception as e:
+        print(f"Error syncing cache to DB: {e}")
 
 
 def main():
@@ -102,9 +167,18 @@ def main():
 
     archive_result = None
     cleanup_result = None
+    shutdown_result = None
     action = None
 
     if should_suspend:
+        # 1. Sync stats to DB first while we have the file
+        app = create_app()
+        sync_cache_to_db(args.instance, args.zone, args.project, app)
+        
+        # 2. Shutdown server
+        shutdown_result = shutdown_minecraft(args.instance, args.zone, args.project, args.dry_run)
+        
+        # 3. Archive files
         archive_cmd = gcloud_ssh_command(
             args.instance,
             args.zone,

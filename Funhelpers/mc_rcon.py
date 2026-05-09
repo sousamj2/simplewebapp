@@ -1,6 +1,20 @@
 import socket
 import struct
+import re
 from flask import current_app
+
+def strip_mc_codes(text):
+    """
+    Strips Minecraft color/formatting codes (§ or & followed by a char)
+    and also removes square brackets from ranks.
+    """
+    if not text:
+        return ""
+    # Remove § and & codes
+    clean = re.sub(r'[§&][0-9a-fk-or]', '', text)
+    # Remove [ and ]
+    clean = clean.replace('[', '').replace(']', '')
+    return clean.strip()
 
 def run_rcon_command(command):
     """
@@ -79,7 +93,7 @@ def get_player_stats(player_name):
     # Format claims
     stats = {
         "uuid": raw_stats["uuid"],
-        "rank": raw_stats["rank"],
+        "rank": strip_mc_codes(raw_stats["rank"]),
         "bank": raw_stats["bank"],
         "claims": f"{raw_stats['rem_claims']}/{raw_stats['total_claims']}" if raw_stats['rem_claims'] != "NA" else "NA"
     }

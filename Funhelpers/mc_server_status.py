@@ -11,6 +11,7 @@ def get_mc_status():
         "online": False,
         "players_online": 0,
         "players_max": 0,
+        "players_list": [],
         "motd": "",
         "latency": 0
     }
@@ -23,6 +24,7 @@ def get_mc_status():
         status_dict["online"] = True
         status_dict["players_online"] = status.players.online
         status_dict["players_max"] = status.players.max
+        status_dict["players_list"] = [p.name for p in status.players.sample] if status.players.sample else []
         status_dict["motd"] = status.description
         status_dict["latency"] = round(status.latency, 2)
         

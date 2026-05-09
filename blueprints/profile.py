@@ -12,8 +12,9 @@ from markupsafe import Markup
 from pprint import pprint
 from math import ceil
 
-from mysql.DBhelpers import get_user_profile_tier1
+from mysql.DBhelpers import get_user_profile_tier1, update_mc_stats
 from simplewebapp.Funhelpers import get_lisbon_greeting
+from datetime import datetime
 
 bp_profile = Blueprint("profile", __name__, url_prefix="/profile")
 
@@ -60,8 +61,43 @@ def profile():
         mc_status = get_mc_status()
         ign = session["metadata"].get("ign")
         stats = {}
+        last_online_display = "Unknown"
+        
+        # Default stats from DB
+        stats = {
+            "uuid": session["metadata"].get("mc_uuid") or "NA",
+            "rank": session["metadata"].get("mc_rank") or "NA",
+            "bank": session["metadata"].get("mc_bank") or "NA",
+            "claims": session["metadata"].get("mc_claims") or "NA",
+        }
+        
+        last_online_dt = session["metadata"].get("mc_last_online")
+        if last_online_dt:
+            last_online_display = format_data(last_online_dt)
+
         if ign and mc_status.get("online"):
-            stats = get_player_stats(ign)
+            rcon_stats = get_player_stats(ign)
+            if rcon_stats and rcon_stats.get("uuid") != "NA":
+                stats = rcon_stats
+                # Update last online if player is actually in the server list
+                current_time = datetime.now()
+                is_online_now = ign.lower() in [p.lower() for p in mc_status.get("players_list", [])]
+                
+                if is_online_now:
+                    last_online_display = "Now"
+                    last_online_val = current_time
+                else:
+                    last_online_val = last_online_dt
+                
+                # Sync to DB
+                update_mc_stats(
+                    email, 
+                    stats["uuid"], 
+                    stats["rank"], 
+                    stats["bank"], 
+                    stats["claims"], 
+                    last_online_val
+                )
         
         # Merge mc_status into metadata for the template
         session["metadata"]["mc_status"] = mc_status
@@ -104,6 +140,7 @@ def profile():
             email=session["metadata"].get("email", ""),
             ign=session["metadata"].get("ign", ""),
             lastlogin=format_data(session["metadata"].get("lastlogints", "")),
+            last_online_display=last_online_display,
             user_picture=mypict,
             player_rank=stats.get("rank", "NA"),
             player_bank=stats.get("bank", "NA"),
