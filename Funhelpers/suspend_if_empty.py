@@ -86,7 +86,7 @@ def shutdown_minecraft(instance: str, zone: str, project: str | None, dry_run: b
     return run_command(stop_svc_cmd, dry_run=dry_run)
 
 
-def sync_cache_to_db(instance: str, zone: str, project: str | None, app):
+def sync_cache_to_db(instance: str, zone: str, project: str | None):
     """
     Reads usecache_0.json from the remote server and updates the local DB.
     """
@@ -98,28 +98,27 @@ def sync_cache_to_db(instance: str, zone: str, project: str | None, app):
     
     try:
         cache = json.loads(res.get('stdout', '{}'))
-        with app.app_context():
-            for uuid, data in cache.items():
-                ign = data.get('player')
-                if not ign:
-                    continue
-                
-                email = getEmailFromIgn(ign)
-                if not email:
-                    continue
-                
-                # Fetch more stats via RCON if possible, but here we likely only have what's in JSON
-                # The user wants to update the DB with _0 file info.
-                last_online = data.get('measured_at')
-                # If they were in the cache, they were online recently.
-                update_mc_stats(
-                    email,
-                    uuid,
-                    data.get('rank', 'NR'),
-                    "NA", # bank not in usecache JSON usually
-                    "NA", # claims not in usecache JSON usually
-                    last_online
-                )
+        for uuid, data in cache.items():
+            ign = data.get('player')
+            if not ign:
+                continue
+            
+            email = getEmailFromIgn(ign)
+            if not email:
+                continue
+            
+            # Fetch more stats via RCON if possible, but here we likely only have what's in JSON
+            # The user wants to update the DB with _0 file info.
+            last_online = data.get('measured_at')
+            # If they were in the cache, they were online recently.
+            update_mc_stats(
+                email,
+                uuid,
+                data.get('rank', 'NR'),
+                "NA", # bank not in usecache JSON usually
+                "NA", # claims not in usecache JSON usually
+                last_online
+            )
         print("Database sync from cache completed.")
     except Exception as e:
         print(f"Error syncing cache to DB: {e}")
@@ -215,36 +214,37 @@ def main():
     action = None
 
     if should_suspend:
-        # 1. Sync stats to DB first while we have the file
         app = create_app()
-        sync_cache_to_db(args.instance, args.zone, args.project, app)
-        
-        # 2. Unban temporary AFKers before stopping
-        unban_afk_players(args.instance, args.zone, args.project)
-        
-        # 3. Shutdown server
-        shutdown_result = shutdown_minecraft(args.instance, args.zone, args.project, args.dry_run)
-        
-        # 4. Archive files
-        archive_cmd = gcloud_ssh_command(
-            args.instance,
-            args.zone,
-            f'sudo bash {args.archive_script}',
-            args.project,
-        )
-        archive_result = run_command(archive_cmd, dry_run=args.dry_run)
-
-        if archive_result.get('ok', False):
-            cleanup_cmd = gcloud_ssh_command(
+        with app.app_context():
+            # 1. Sync stats to DB first while we have the file
+            sync_cache_to_db(args.instance, args.zone, args.project)
+            
+            # 2. Unban temporary AFKers before stopping
+            unban_afk_players(args.instance, args.zone, args.project)
+            
+            # 3. Shutdown server
+            shutdown_result = shutdown_minecraft(args.instance, args.zone, args.project, args.dry_run)
+            
+            # 4. Archive files
+            archive_cmd = gcloud_ssh_command(
                 args.instance,
                 args.zone,
-                'sudo rm -vf /home/minecraft/cronjobs/usecache_*.json',
+                f'sudo bash {args.archive_script}',
                 args.project,
             )
-            cleanup_result = run_command(cleanup_cmd, dry_run=args.dry_run)
+            archive_result = run_command(archive_cmd, dry_run=args.dry_run)
 
-            if cleanup_result.get('ok', False):
-                action = run_gcloud_suspend(args.instance, args.zone, args.project, args.dry_run)
+            if archive_result.get('ok', False):
+                cleanup_cmd = gcloud_ssh_command(
+                    args.instance,
+                    args.zone,
+                    'sudo rm -vf /home/minecraft/cronjobs/usecache_*.json',
+                    args.project,
+                )
+                cleanup_result = run_command(cleanup_cmd, dry_run=args.dry_run)
+
+                if cleanup_result.get('ok', False):
+                    action = run_gcloud_suspend(args.instance, args.zone, args.project, args.dry_run)
 
     result = {
         'measured_at': measured_at,
