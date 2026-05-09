@@ -42,6 +42,14 @@ def run_gcloud_suspend(instance: str, zone: str, project: str | None, dry_run: b
     return run_command(cmd, dry_run=dry_run)
 
 
+def get_instance_status(instance: str, zone: str, project: str | None):
+    cmd = ['gcloud', 'compute', 'instances', 'describe', instance, f'--zone={zone}', '--format=value(status)']
+    if project:
+        cmd.append(f'--project={project}')
+    res = run_command(cmd)
+    return res.get('stdout', '').strip().upper() if res.get('ok') else 'UNKNOWN'
+
+
 def save_json(path: Path, data):
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, indent=2, sort_keys=True), encoding='utf-8')
@@ -59,6 +67,23 @@ def main():
     args = parser.parse_args()
 
     measured_at = datetime.now(timezone.utc).astimezone().isoformat(timespec='seconds')
+    
+    # Check instance status first to avoid timeouts
+    status_vm = get_instance_status(args.instance, args.zone, args.project)
+    if status_vm != 'RUNNING':
+        result = {
+            'measured_at': measured_at,
+            'instance': args.instance,
+            'zone': args.zone,
+            'status_vm': status_vm,
+            'message': f'Instance is not RUNNING (current status: {status_vm}). Skipping.'
+        }
+        if args.summary:
+            print(json.dumps(result))
+        else:
+            print(json.dumps(result, indent=2, sort_keys=True))
+        sys.exit(0)
+
     status = get_mc_status()
     online = bool(status.get('online'))
     players_online = int(status.get('players_online', 0) or 0)
