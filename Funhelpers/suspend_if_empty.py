@@ -28,38 +28,43 @@ REMOTE_ARCHIVE_SCRIPT = '/home/minecraft/cronjobs/archive_cronjobs.sh'
 
 def run_command(cmd, dry_run=False, timeout=120):
     if dry_run:
-        return {'ok': True, 'dry_run': True, 'command': cmd, 'stdout': '', 'stderr': ''}
-    proc = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
-    return {
-        'ok': proc.returncode == 0,
-        'dry_run': False,
-        'command': cmd,
-        'stdout': (proc.stdout or '').strip(),
-        'stderr': (proc.stderr or '').strip(),
-        'returncode': proc.returncode,
-    }
+        print(f"[DRY RUN] Would execute: {cmd}")
+        return {'ok': True, 'stdout': '', 'stderr': '', 'returncode': 0}
+
+    try:
+        res = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=timeout)
+        return {
+            'ok': res.returncode == 0,
+            'stdout': res.stdout.strip(),
+            'stderr': res.stderr.strip(),
+            'returncode': res.returncode
+        }
+    except Exception as e:
+        return {'ok': False, 'stdout': '', 'stderr': str(e), 'returncode': -1}
 
 
-def gcloud_ssh_command(instance: str, zone: str, remote_command: str, project: str | None):
-    cmd = ['gcloud', 'compute', 'ssh', instance, f'--zone={zone}', f'--command={remote_command}']
+def gcloud_ssh_command(instance, zone, remote_command, project=None):
+    base = f"gcloud compute ssh {instance} --zone {zone} "
     if project:
-        cmd.append(f'--project={project}')
-    return cmd
+        base += f"--project {project} "
+    base += f"--quiet -- '{remote_command}'"
+    return base
 
 
-def run_gcloud_suspend(instance: str, zone: str, project: str | None, dry_run: bool):
-    cmd = ['gcloud', 'compute', 'instances', 'suspend', instance, f'--zone={zone}']
+def get_instance_status(instance, zone, project=None):
+    cmd = f"gcloud compute instances describe {instance} --zone {zone} "
     if project:
-        cmd.append(f'--project={project}')
-    return run_command(cmd, dry_run=dry_run)
-
-
-def get_instance_status(instance: str, zone: str, project: str | None):
-    cmd = ['gcloud', 'compute', 'instances', 'describe', instance, f'--zone={zone}', '--format=value(status)']
-    if project:
-        cmd.append(f'--project={project}')
+        cmd += f"--project {project} "
+    cmd += "--format='get(status)'"
     res = run_command(cmd)
-    return res.get('stdout', '').strip().upper() if res.get('ok') else 'UNKNOWN'
+    return res.get('stdout', 'UNKNOWN')
+
+
+def run_gcloud_suspend(instance, zone, project=None, dry_run=False):
+    cmd = f"gcloud compute instances suspend {instance} --zone {zone} --quiet"
+    if project:
+        cmd += f" --project {project}"
+    return run_command(cmd, dry_run=dry_run)
 
 
 def save_json(path: Path, data):
@@ -120,20 +125,59 @@ def sync_cache_to_db(instance: str, zone: str, project: str | None, app):
         print(f"Error syncing cache to DB: {e}")
 
 
+def unban_afk_players(instance: str, zone: str, project: str | None):
+    """
+    Checks banned-players.json and unbans anyone with a temp ban < 7 minutes.
+    """
+    print("Checking for temporary AFK bans to lift...")
+    cat_cmd = gcloud_ssh_command(instance, zone, "cat /home/minecraft/banned-players.json", project)
+    res = run_command(cat_cmd)
+    if not res.get('ok'):
+        return
+    
+    try:
+        banned = json.loads(res.get('stdout', '[]'))
+        if not banned:
+            return
+
+        for entry in banned:
+            created_str = entry.get('created')
+            expires_str = entry.get('expires')
+            name = entry.get('name')
+            
+            if not created_str or not expires_str or not name:
+                continue
+            
+            # Format: 2026-05-09 13:16:02 +0000
+            fmt = "%Y-%m-%d %H:%M:%S %z"
+            try:
+                created = datetime.strptime(created_str, fmt)
+                expires = datetime.strptime(expires_str, fmt)
+                
+                duration = (expires - created).total_seconds()
+                if duration < 420: # 7 minutes (420 seconds)
+                    print(f"Unbanning AFK player {name} (duration: {duration/60:.1f}m)")
+                    run_rcon_command(f"pardon {name}")
+            except ValueError as ve:
+                print(f"Could not parse dates for {name}: {ve}")
+                
+    except Exception as e:
+        print(f"Error unbanning players: {e}")
+
+
 def main():
     parser = argparse.ArgumentParser(description='Suspend a GCE VM when the Minecraft server is online with zero players.')
     parser.add_argument('--instance', default=INSTANCE_NAME)
     parser.add_argument('--zone', default=ZONE)
     parser.add_argument('--project', default=None)
-    parser.add_argument('--state-file', default=str(STATE_FILE))
     parser.add_argument('--archive-script', default=REMOTE_ARCHIVE_SCRIPT)
+    parser.add_argument('--state-file', default=STATE_FILE)
     parser.add_argument('--dry-run', action='store_true')
     parser.add_argument('--summary', action='store_true')
     args = parser.parse_args()
 
-    measured_at = datetime.now(timezone.utc).astimezone().isoformat(timespec='seconds')
-    
-    # Check instance status first to avoid timeouts
+    measured_at = datetime.now(timezone.utc).astimezone().isoformat()
+
     status_vm = get_instance_status(args.instance, args.zone, args.project)
     if status_vm != 'RUNNING':
         result = {
@@ -175,10 +219,13 @@ def main():
         app = create_app()
         sync_cache_to_db(args.instance, args.zone, args.project, app)
         
-        # 2. Shutdown server
+        # 2. Unban temporary AFKers before stopping
+        unban_afk_players(args.instance, args.zone, args.project)
+        
+        # 3. Shutdown server
         shutdown_result = shutdown_minecraft(args.instance, args.zone, args.project, args.dry_run)
         
-        # 3. Archive files
+        # 4. Archive files
         archive_cmd = gcloud_ssh_command(
             args.instance,
             args.zone,
@@ -222,7 +269,7 @@ def main():
     else:
         print(json.dumps(result, indent=2, sort_keys=True))
 
-    if any(step and not step.get('ok', False) for step in [archive_result, cleanup_result, action]):
+    if any(step and not step.get('ok', False) for step in [shutdown_result, archive_result, cleanup_result, action]):
         sys.exit(1)
 
 
