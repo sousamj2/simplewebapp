@@ -157,6 +157,26 @@ def unban_afk_players(instance: str, zone: str, project: str | None):
                 if duration < 420: # 7 minutes (420 seconds)
                     print(f"Unbanning AFK player {name} (duration: {duration/60:.1f}m)")
                     run_rcon_command(f"pardon {name}")
+                    
+                    # Also scrub them from the caches to prevent immediate re-ban on restart
+                    uuid = entry.get('uuid')
+                    scrub_py = (
+                        "import json; from pathlib import Path; "
+                        "paths = ['/home/minecraft/cronjobs/usecache_0.json', "
+                        "'/home/minecraft/cronjobs/usecache_5.json', "
+                        "'/home/minecraft/cronjobs/usecache_10.json']; "
+                        f"target_uuid = '{uuid}'; "
+                        "for p in [Path(x) for x in paths]: "
+                        "if p.exists(): "
+                        "try: "
+                        "data = json.loads(p.read_text()); "
+                        "if target_uuid in data: "
+                        "del data[target_uuid]; "
+                        "p.write_text(json.dumps(data, indent=2)); "
+                        "except: pass"
+                    )
+                    scrub_cmd = gcloud_ssh_command(instance, zone, f"sudo python3 -c \"{scrub_py}\"", project)
+                    run_command(scrub_cmd)
             except ValueError as ve:
                 print(f"Could not parse dates for {name}: {ve}")
                 
