@@ -83,7 +83,7 @@ def main():
         archive_cmd = gcloud_ssh_command(
             args.instance,
             args.zone,
-            f'bash {args.archive_script}',
+            f'sudo bash {args.archive_script}',
             args.project,
         )
         archive_result = run_command(archive_cmd, dry_run=args.dry_run)
