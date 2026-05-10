@@ -33,8 +33,8 @@ export FLASK_ENV=development
 export FLASK_DEBUG=1
 
 echo -e "${YELLOW}📍 Access URLs:${NC}"
-echo -e "   Local:  http://localhost:8080"
-echo -e "   Local:  https://mc.mjcrafts.pt"
+echo -e "   Local:  http://localhost:8081"
+echo -e "   Remote: https://mc.mjcrafts.pt"
 echo ""
 echo -e "${YELLOW}💡 Features enabled:${NC}"
 echo -e "   ✅ Auto-reload on file changes"
