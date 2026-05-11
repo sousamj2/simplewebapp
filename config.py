@@ -155,10 +155,10 @@ class Config:
 
     # RDS Connection to MySQL
     MYSQL_PASSWORD = _get("MC_MYSQL_PASSWORD") or _get("MYSQL_PASSWORD")
-    MYSQL_HOST     = _get("MYSQL_HOST")
+    MYSQL_HOST     = _get("MC_MYSQL_HOST") or _get("MYSQL_HOST")
     MYSQL_USER     = _get("MC_MYSQL_USER") or _get("MYSQL_USER") or "admin"
-    MYSQL_DBNAME   = _get("MC_MYSQL_DBNAME") or _get("MYSQL_DBNAME") or "mc_mjcrafts"
-    MYSQL_PORT     = int(_get("MYSQL_PORT", "3306"))
+    MYSQL_DBNAME   = _get("MC_MYSQL_DBNAME") or "mc_mjcrafts"
+    MYSQL_PORT     = int(_get("MC_MYSQL_PORT") or _get("MYSQL_PORT") or "3306")
 
     if not MYSQL_PASSWORD or not MYSQL_USER:
         print("[CONFIG] CRITICAL ERROR: mc_mjcrafts Database credentials (MYSQL_USER or MYSQL_PASSWORD) are missing. Please check AWS SSM or local .env.", flush=True)

@@ -33,7 +33,7 @@ export FLASK_ENV=development
 export FLASK_DEBUG=1
 
 echo -e "${YELLOW}📍 Access URLs:${NC}"
-echo -e "   Local:  http://localhost:8081"
+echo -e "   Local:  http://[::1]:8081"
 echo -e "   Remote: https://mc.mjcrafts.pt"
 echo ""
 echo -e "${YELLOW}💡 Features enabled:${NC}"
@@ -46,4 +46,4 @@ echo ""
 
 # Start Flask
 # $VENV_PATH/bin/flask run --host=localhost --port=8080
-$VENV_PATH/bin/flask run --host=0.0.0.0 --port=8081
+$VENV_PATH/bin/flask run --host=:: --port=8081
