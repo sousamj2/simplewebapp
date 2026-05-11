@@ -45,7 +45,7 @@ if __name__ == '__main__':
     
     serve(
         app, 
-        host='::', 
+        host='*', 
         port=port, 
         threads=8, 
         channel_timeout=120, 
