@@ -82,12 +82,14 @@ def profile():
                 # Update last online if RCON says they are online
                 current_time = datetime.now()
                 
+                print(f"[SYNC DEBUG] Online: {stats.get('is_online')}, UUID: {stats.get('uuid')}", flush=True)
                 if stats.get("is_online"):
                     last_online_display = "Now"
                     last_online_val = current_time
                     
                     # Sync stats to DB ONLY while online to preserve them when offline
-                    update_mc_stats(
+                    print(f"[SYNC DEBUG] Attempting DB update for {email}...", flush=True)
+                    res = update_mc_stats(
                         email, 
                         stats["uuid"], 
                         stats["rank"], 
@@ -95,6 +97,7 @@ def profile():
                         stats["claims"], 
                         last_online_val
                     )
+                    print(f"[SYNC DEBUG] DB Update Result: {res}", flush=True)
                 else:
                     # If RCON returned an 'Offline for X' string, use it for display
                     if "ago" in str(stats.get("last_online", "")):
