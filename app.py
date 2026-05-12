@@ -73,6 +73,22 @@ def create_app(config_name=None):
     app.register_blueprint(bp_support)
     app.register_blueprint(bp_getting_started)
     
+    @app.context_processor
+    def inject_copyright():
+        from flask import request
+        host = request.host
+        
+        # Determine display name based on domain
+        if "matematica.pt" in host:
+            display_name = "MATEMATICA.PT"
+        else:
+            display_name = "MJCRAFTS.PT"
+            
+        return {
+            'current_year': 2026,
+            'copyright_name': display_name
+        }
+    
     
     # Main route: redirect to /pages/ (home)
     @app.route('/')
