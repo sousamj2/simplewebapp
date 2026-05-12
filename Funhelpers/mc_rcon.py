@@ -77,13 +77,13 @@ def get_player_stats(player_name):
     if online_res and "Error" not in online_res:
         # Strip color codes from the list response
         clean_list = strip_mc_codes(online_res)
-        print(f"DEBUG RCON: List response: '{clean_list}'", flush=True)
         
         # 'list' usually returns: "There are 1 of 20 players online: player1, player2"
-        # We check if player_name is in the part after the colon
+        # Or: "Admins: ADMIN mjsousa"
         if ":" in clean_list:
-            players_part = clean_list.split(":", 1)[1]
-            is_online = player_name.lower() in [p.strip().lower() for p in players_part.split(",")]
+            # We look at the entire part after the first colon to be safe with multiline responses
+            players_part = clean_list.split(":", 1)[1].lower()
+            is_online = player_name.lower() in players_part
         else:
             is_online = player_name.lower() in clean_list.lower()
 
