@@ -108,8 +108,9 @@ def get_player_stats(player_name):
             
     # 3. Fallback: If UUID or last_online is NA, try to get it from 'seen' command
     if raw_stats["uuid"] == "NA" or raw_stats["last_online"] == "NA":
-        seen_res = run_rcon_command(f"seen {player_name}")
-        if seen_res and "Error" not in seen_res:
+        seen_res_raw = run_rcon_command(f"seen {player_name}")
+        if seen_res_raw and "Error" not in seen_res_raw:
+            seen_res = strip_mc_codes(seen_res_raw)
             import re
             # Extract UUID
             if raw_stats["uuid"] == "NA":
