@@ -85,18 +85,25 @@ def profile():
                 if stats.get("is_online"):
                     last_online_display = "Now"
                     last_online_val = current_time
+                    
+                    # ONLY Sync to DB if we have fresh data (online)
+                    update_mc_stats(
+                        email, 
+                        stats["uuid"], 
+                        stats["rank"], 
+                        stats["bank"], 
+                        stats["claims"], 
+                        last_online_val
+                    )
                 else:
+                    # If RCON returned an 'Offline for X' string, use it for display
+                    if "Offline for" in str(stats.get("last_online", "")):
+                        last_online_display = stats["last_online"]
+                    
+                    # Keep the timestamp value we loaded from the DB earlier
                     last_online_val = last_online_dt
-                
-                # Sync to DB
-                update_mc_stats(
-                    email, 
-                    stats["uuid"], 
-                    stats["rank"], 
-                    stats["bank"], 
-                    stats["claims"], 
-                    last_online_val
-                )
+                    # If RCON returned a rank/bank/claims even while offline, we can still show them
+                    # but we DON'T update the database mc_last_online column with NULL.
             else:
                 # If RCON failed, keep the DB value
                 last_online_val = last_online_dt

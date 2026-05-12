@@ -93,18 +93,39 @@ def get_player_stats(player_name):
         "bank": "%vault_eco_balance%",
         "rem_claims": "%griefprevention_remainingclaims%",
         "total_claims": "%griefprevention_claims%",
-        "last_online": "%essentials_last_seen_date%"
+        "last_online": "%essentials_last_login_date%"
     }
     
     raw_stats = {}
     for key, placeholder in placeholders.items():
         cmd = f"papi parse {player_name} {placeholder}"
         res = run_rcon_command(cmd)
+        print(f"DEBUG RCON: PAPI {placeholder} -> '{res}'", flush=True)
         if res and "Error" not in res and res.strip() != placeholder:
             raw_stats[key] = res.strip()
         else:
             raw_stats[key] = "NA"
             
+    # 3. Fallback: If UUID or last_online is NA, try to get it from 'seen' command
+    if raw_stats["uuid"] == "NA" or raw_stats["last_online"] == "NA":
+        seen_res = run_rcon_command(f"seen {player_name}")
+        if seen_res and "Error" not in seen_res:
+            import re
+            # Extract UUID
+            if raw_stats["uuid"] == "NA":
+                match_uuid = re.search(r"UUID:\s*([a-f0-9\-]+)", seen_res)
+                if match_uuid:
+                    raw_stats["uuid"] = match_uuid.group(1)
+            
+            # Extract "offline since X"
+            if raw_stats["last_online"] == "NA":
+                # Look for "offline since 6 seconds" or similar
+                match_seen = re.search(r"offline since (.*)", seen_res, re.IGNORECASE)
+                if match_seen:
+                    raw_stats["last_online"] = f"Offline for {match_seen.group(1).split('.')[0].strip()}"
+                elif "online since" in seen_res.lower():
+                    raw_stats["last_online"] = "Now"
+
     # Format claims
     stats = {
         "uuid": raw_stats["uuid"],
