@@ -37,6 +37,17 @@ if __name__ == '__main__':
         x_prefix=1
     )
     
+    @app.before_request
+    def log_request_info():
+        from flask import request
+        # Only log for authentication routes to keep logs clean
+        if 'signin' in request.path or 'oauth2' in request.path:
+            print(f"\n[DEBUG] --- Incoming Request: {request.path} ---", flush=True)
+            print(f"[DEBUG] Host Header: {request.headers.get('Host')}", flush=True)
+            print(f"[DEBUG] X-Forwarded-Proto: {request.headers.get('X-Forwarded-Proto')}", flush=True)
+            print(f"[DEBUG] X-Forwarded-Host: {request.headers.get('X-Forwarded-Host')}", flush=True)
+            print(f"[DEBUG] Flask thinks URL is: {request.url}", flush=True)
+    
     # 4. Start the Production Server
     port = 8081
     print(f"🚀 Starting Waitress Production Server on port {port}...")
@@ -50,5 +61,7 @@ if __name__ == '__main__':
         threads=8, 
         channel_timeout=120, 
         connection_limit=100, 
-        backlog=2048
+        backlog=2048,
+        trusted_proxy='*', # Trust headers from all proxies (since we handle it via ProxyFix)
+        trusted_proxy_headers=['x-forwarded-for', 'x-forwarded-proto', 'x-forwarded-host', 'x-forwarded-port']
     )
