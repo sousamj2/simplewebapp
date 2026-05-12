@@ -78,7 +78,8 @@ def get_player_stats(player_name):
         "rank": "%luckperms_prefix%",
         "bank": "%vault_eco_balance%",
         "rem_claims": "%griefprevention_remainingclaims%",
-        "total_claims": "%griefprevention_claims%"
+        "total_claims": "%griefprevention_claims%",
+        "last_online": "%essentials_last_seen_date%"
     }
     
     raw_stats = {}
@@ -95,7 +96,8 @@ def get_player_stats(player_name):
         "uuid": raw_stats["uuid"],
         "rank": strip_mc_codes(raw_stats["rank"]),
         "bank": raw_stats["bank"],
-        "claims": f"{raw_stats['rem_claims']}/{raw_stats['total_claims']}" if raw_stats['rem_claims'] != "NA" else "NA"
+        "claims": f"{raw_stats['rem_claims']}/{raw_stats['total_claims']}" if raw_stats['rem_claims'] != "NA" else "NA",
+        "last_online": raw_stats["last_online"]
     }
             
     return stats

@@ -75,19 +75,16 @@ def profile():
         if last_online_dt:
             last_online_display = format_data(last_online_dt)
 
-        if ign and mc_status.get("online"):
+        if ign and (mc_status.get("online") or True): # Try RCON if server might be online
             rcon_stats = get_player_stats(ign)
             if rcon_stats and rcon_stats.get("uuid") != "NA":
                 stats = rcon_stats
-                # Update last online if player is actually in the server list
+                # Update last online if RCON successfully fetched stats (implies online)
                 current_time = datetime.now()
-                is_online_now = ign.lower() in [p.lower() for p in mc_status.get("players_list", [])]
                 
-                if is_online_now:
-                    last_online_display = "Now"
-                    last_online_val = current_time
-                else:
-                    last_online_val = last_online_dt
+                # If RCON returned a valid UUID, the player is definitely online
+                last_online_display = "Now"
+                last_online_val = current_time
                 
                 # Sync to DB
                 update_mc_stats(
@@ -98,6 +95,9 @@ def profile():
                     stats["claims"], 
                     last_online_val
                 )
+            else:
+                # If RCON failed, keep the DB value
+                last_online_val = last_online_dt
         
         # Merge mc_status into metadata for the template
         session["metadata"]["mc_status"] = mc_status
