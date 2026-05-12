@@ -9,7 +9,6 @@ from flask import (
     flash,
 )
 from markupsafe import Markup
-from pprint import pprint
 from math import ceil
 
 from mysql.DBhelpers import get_user_profile_tier1, update_mc_stats

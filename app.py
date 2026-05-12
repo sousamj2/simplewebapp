@@ -5,7 +5,6 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../mysql')))
 
 from flask import Flask, redirect, render_template
-from pprint import pprint
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 from dotenv import load_dotenv
