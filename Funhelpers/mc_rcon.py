@@ -22,13 +22,15 @@ def run_rcon_command(command):
     Avoids signal issues found in some libraries.
     """
     host = current_app.config.get("RCON_HOST", "35.210.3.240")
+    # Strip brackets if present (common for IPv6 in URLs/configs)
+    host = host.strip("[]")
     port = current_app.config.get("RCON_PORT", 25575)
     password = current_app.config.get("RCON_PASSWORD")
     
     if not password:
         return "Error: RCON password not configured"
         
-    # print(f"DEBUG RCON: Attempting connection to {host}:{port}", flush=True)
+    print(f"DEBUG RCON: Attempting connection to [{host}]:{port}", flush=True)
     
     try:
         # Create connection (handles both IPv4 and IPv6 automatically)
