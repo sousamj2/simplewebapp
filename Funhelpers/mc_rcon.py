@@ -123,7 +123,7 @@ def get_player_stats(player_name):
                 # Look for "offline since 6 seconds" or similar
                 match_seen = re.search(r"offline since (.*)", seen_res, re.IGNORECASE)
                 if match_seen:
-                    raw_stats["last_online"] = f"Offline for {match_seen.group(1).split('.')[0].strip()}"
+                    raw_stats["last_online"] = f"{match_seen.group(1).split('.')[0].strip()} ago"
                 elif "online since" in seen_res.lower():
                     raw_stats["last_online"] = "Now"
 
