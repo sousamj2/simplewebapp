@@ -82,14 +82,12 @@ def profile():
                 # Update last online if RCON says they are online
                 current_time = datetime.now()
                 
-                print(f"[SYNC DEBUG] Online: {stats.get('is_online')}, UUID: {stats.get('uuid')}", flush=True)
                 if stats.get("is_online"):
                     last_online_display = "Now"
                     last_online_val = current_time
                     
                     # Sync stats to DB ONLY while online to preserve them when offline
-                    print(f"[SYNC DEBUG] Attempting DB update for {email}...", flush=True)
-                    res = update_mc_stats(
+                    update_mc_stats(
                         email, 
                         stats["uuid"], 
                         stats["rank"], 
@@ -97,16 +95,18 @@ def profile():
                         stats["claims"], 
                         last_online_val
                     )
-                    print(f"[SYNC DEBUG] DB Update Result: {res}", flush=True)
                 else:
-                    # If RCON returned an 'Offline for X' string, use it for display
+                    # Player is offline. Use values from the database (already in session metadata)
+                    stats["rank"] = session["metadata"].get("mc_rank") or "NA"
+                    stats["bank"] = session["metadata"].get("mc_bank") or "0.0"
+                    stats["claims"] = session["metadata"].get("mc_claims") or "NA"
+                    
+                    # If RCON returned an 'ago' string from /seen, use it for display
                     if "ago" in str(stats.get("last_online", "")):
                         last_online_display = stats["last_online"]
                     
                     # Keep the timestamp value we loaded from the DB earlier
                     last_online_val = last_online_dt
-                    # If RCON returned a rank/bank/claims even while offline, we can still show them
-                    # but we DON'T update the database mc_last_online column with NULL.
             else:
                 # If RCON failed, keep the DB value
                 last_online_val = last_online_dt

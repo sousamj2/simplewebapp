@@ -136,5 +136,4 @@ def get_player_stats(player_name):
         "is_online": is_online
     }
             
-    print(f"DEBUG RCON: Final stats for {player_name}: {stats}", flush=True)
     return stats
