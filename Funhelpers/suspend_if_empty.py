@@ -28,7 +28,6 @@ REMOTE_ARCHIVE_SCRIPT = '/home/minecraft/cronjobs/archive_cronjobs.sh'
 
 def run_command(cmd, dry_run=False, timeout=120):
     if dry_run:
-        print(f"[DRY RUN] Would execute: {cmd}")
         return {'ok': True, 'stdout': '', 'stderr': '', 'returncode': 0}
 
     try:
@@ -76,9 +75,7 @@ def shutdown_minecraft(instance: str, zone: str, project: str | None, dry_run: b
     """
     Saves the world and stops the Minecraft server gracefully.
     """
-    print("Requesting server save...")
     run_rcon_command("save-all")
-    print("Requesting server stop...")
     run_rcon_command("stop")
     
     # Also ensure systemd service is stopped
@@ -93,7 +90,6 @@ def sync_cache_to_db(instance: str, zone: str, project: str | None):
     cat_cmd = gcloud_ssh_command(instance, zone, "cat /home/minecraft/cronjobs/usecache_0.json", project)
     res = run_command(cat_cmd)
     if not res.get('ok'):
-        print(f"Failed to read remote cache: {res.get('stderr')}")
         return
     
     try:
@@ -119,16 +115,11 @@ def sync_cache_to_db(instance: str, zone: str, project: str | None):
                 "NA", # claims not in usecache JSON usually
                 last_online
             )
-        print("Database sync from cache completed.")
     except Exception as e:
-        print(f"Error syncing cache to DB: {e}")
+        pass
 
 
 def unban_afk_players(instance: str, zone: str, project: str | None):
-    """
-    Checks banned-players.json and unbans anyone with a temp ban < 7 minutes.
-    """
-    print("Checking for temporary AFK bans to lift...")
     cat_cmd = gcloud_ssh_command(instance, zone, "cat /home/minecraft/banned-players.json", project)
     res = run_command(cat_cmd)
     if not res.get('ok'):
@@ -155,7 +146,6 @@ def unban_afk_players(instance: str, zone: str, project: str | None):
                 
                 duration = (expires - created).total_seconds()
                 if duration < 420: # 7 minutes (420 seconds)
-                    print(f"Unbanning AFK player {name} (duration: {duration/60:.1f}m)")
                     run_rcon_command(f"pardon {name}")
                     
                     # Also scrub them from the caches to prevent immediate re-ban on restart
@@ -177,11 +167,11 @@ def unban_afk_players(instance: str, zone: str, project: str | None):
                     )
                     scrub_cmd = gcloud_ssh_command(instance, zone, f"sudo python3 -c \"{scrub_py}\"", project)
                     run_command(scrub_cmd)
-            except ValueError as ve:
-                print(f"Could not parse dates for {name}: {ve}")
+            except ValueError:
+                pass
                 
-    except Exception as e:
-        print(f"Error unbanning players: {e}")
+    except Exception:
+        pass
 
 
 def main():

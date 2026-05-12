@@ -22,10 +22,8 @@ def render_profile_template(template_text):
     
     # Minecraft Stats (Fetch if server is likely online)
     ign = metadata.get("ign")
-    print("DEBUG", ign, flush=True)
     if ign:
         stats = get_player_stats(ign)
-        print("DEBUG", stats, flush=True)
         rendered = rendered.replace("{{player_rank}}", stats.get("rank", "NA"))
         rendered = rendered.replace("{{player_bank}}", stats.get("bank", "NA"))
         rendered = rendered.replace("{{player_claims}}", stats.get("claims", "NA"))

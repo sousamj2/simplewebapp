@@ -56,11 +56,9 @@ def run_rcon_command(command):
         _, _, response = send_packet(2, command)
         
         sock.close()
-        print(f"DEBUG RCON: Response: {response.strip()}", flush=True)
         return response.strip()
         
     except Exception as e:
-        print(f"DEBUG RCON: Error: {str(e)}", flush=True)
         return f"Error: {str(e)}"
 
 def get_player_stats(player_name):
