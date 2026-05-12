@@ -40,6 +40,7 @@ def create_app(config_name=None):
     # Load configuration
     from config import config
     app.config.from_object(config[config_name])
+    app.config["PREFERRED_URL_SCHEME"] = "https"
     
     # Initialize Flask-Mail via the extension pattern to avoid assigning new attributes on Flask
     mail.init_app(app)
