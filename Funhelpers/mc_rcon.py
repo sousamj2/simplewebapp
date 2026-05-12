@@ -75,13 +75,17 @@ def get_player_stats(player_name):
     online_res = run_rcon_command("list")
     is_online = False
     if online_res and "Error" not in online_res:
+        # Strip color codes from the list response
+        clean_list = strip_mc_codes(online_res)
+        print(f"DEBUG RCON: List response: '{clean_list}'", flush=True)
+        
         # 'list' usually returns: "There are 1 of 20 players online: player1, player2"
         # We check if player_name is in the part after the colon
-        if ":" in online_res:
-            players_part = online_res.split(":", 1)[1]
+        if ":" in clean_list:
+            players_part = clean_list.split(":", 1)[1]
             is_online = player_name.lower() in [p.strip().lower() for p in players_part.split(",")]
         else:
-            is_online = player_name.lower() in online_res.lower()
+            is_online = player_name.lower() in clean_list.lower()
 
     placeholders = {
         "uuid": "%player_uuid%",
