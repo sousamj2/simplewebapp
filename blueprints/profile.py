@@ -79,12 +79,14 @@ def profile():
             rcon_stats = get_player_stats(ign)
             if rcon_stats and rcon_stats.get("uuid") != "NA":
                 stats = rcon_stats
-                # Update last online if RCON successfully fetched stats (implies online)
+                # Update last online if RCON says they are online
                 current_time = datetime.now()
                 
-                # If RCON returned a valid UUID, the player is definitely online
-                last_online_display = "Now"
-                last_online_val = current_time
+                if stats.get("is_online"):
+                    last_online_display = "Now"
+                    last_online_val = current_time
+                else:
+                    last_online_val = last_online_dt
                 
                 # Sync to DB
                 update_mc_stats(

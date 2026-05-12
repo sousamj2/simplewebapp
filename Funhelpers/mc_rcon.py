@@ -30,8 +30,6 @@ def run_rcon_command(command):
     if not password:
         return "Error: RCON password not configured"
         
-    print(f"DEBUG RCON: Attempting connection to [{host}]:{port}", flush=True)
-    
     try:
         # Create connection (handles both IPv4 and IPv6 automatically)
         sock = socket.create_connection((host, port), timeout=5)
@@ -73,6 +71,18 @@ def get_player_stats(player_name):
     if not player_name:
         return {}
         
+    # 1. Check if player is actually online using 'list' command
+    online_res = run_rcon_command("list")
+    is_online = False
+    if online_res and "Error" not in online_res:
+        # 'list' usually returns: "There are 1 of 20 players online: player1, player2"
+        # We check if player_name is in the part after the colon
+        if ":" in online_res:
+            players_part = online_res.split(":", 1)[1]
+            is_online = player_name.lower() in [p.strip().lower() for p in players_part.split(",")]
+        else:
+            is_online = player_name.lower() in online_res.lower()
+
     placeholders = {
         "uuid": "%player_uuid%",
         "rank": "%luckperms_prefix%",
@@ -97,7 +107,8 @@ def get_player_stats(player_name):
         "rank": strip_mc_codes(raw_stats["rank"]),
         "bank": raw_stats["bank"],
         "claims": f"{raw_stats['rem_claims']}/{raw_stats['total_claims']}" if raw_stats['rem_claims'] != "NA" else "NA",
-        "last_online": raw_stats["last_online"]
+        "last_online": raw_stats["last_online"],
+        "is_online": is_online
     }
             
     return stats
