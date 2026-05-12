@@ -100,7 +100,6 @@ def get_player_stats(player_name):
     for key, placeholder in placeholders.items():
         cmd = f"papi parse {player_name} {placeholder}"
         res = run_rcon_command(cmd)
-        print(f"DEBUG RCON: PAPI {placeholder} -> '{res}'", flush=True)
         if res and "Error" not in res and res.strip() != placeholder:
             raw_stats[key] = res.strip()
         else:
