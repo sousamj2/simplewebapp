@@ -31,10 +31,8 @@ def run_rcon_command(command):
     # print(f"DEBUG RCON: Attempting connection to {host}:{port}", flush=True)
     
     try:
-        # Create socket
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(5)
-        sock.connect((host, port))
+        # Create connection (handles both IPv4 and IPv6 automatically)
+        sock = socket.create_connection((host, port), timeout=5)
         
         def send_packet(packet_type, payload):
             # Packet structure: Length (4) | Request ID (4) | Type (4) | Payload (N) | 2 null bytes (2)

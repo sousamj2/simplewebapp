@@ -37,17 +37,6 @@ if __name__ == '__main__':
         x_prefix=1
     )
     
-    @app.before_request
-    def log_request_info():
-        from flask import request
-        # Only log for authentication/registration routes to keep logs clean
-        if any(x in request.path for x in ['signin', 'oauth2', 'signup', 'updateDB']):
-            print(f"\n[DEBUG] --- Incoming Request: {request.path} ---", flush=True)
-            print(f"[DEBUG] Host Header: {request.headers.get('Host')}", flush=True)
-            print(f"[DEBUG] X-Forwarded-Proto: {request.headers.get('X-Forwarded-Proto')}", flush=True)
-            print(f"[DEBUG] X-Forwarded-Host: {request.headers.get('X-Forwarded-Host')}", flush=True)
-            print(f"[DEBUG] Flask thinks URL is: {request.url}", flush=True)
-    
     # 4. Start the Production Server
     port = 8081
     print(f"🚀 Starting Waitress Production Server on port {port}...")
