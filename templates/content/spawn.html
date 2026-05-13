@@ -1,0 +1,448 @@
+<div class="page-content">
+    <h1 class="page-title">Spawn Area</h1>
+    <p class="page-subtitle">A guided tour of <strong>Spawn</strong> — shops, utilities, and how to get your own space in the community market.</p>
+
+    <!-- Spawn Overview -->
+    <div class="accordion-item card">
+        <button class="accordion-btn" aria-expanded="false">
+            <span>🏘️ Spawn Overview</span><span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-body">
+            <p>Spawn is the central hub of the server, containing everything a player needs — from the supermarket (player shops) to quick utility stations.</p>
+
+            <div class="spawn-img-wrap">
+                <a href="{{ url_for('static', filename='images/Spawn_big.png') }}" target="_blank" title="Click to view high-resolution version">
+                    <img src="{{ url_for('static', filename='images/Spawn.png') }}" alt="Spawn area overview" class="spawn-img">
+                </a>
+                <p class="spawn-img-caption">Main spawn area overview (click to enlarge)</p>
+            </div>
+
+            <!-- Currency Exchange -->
+            <div class="sub-accordion-item">
+                <button class="sub-accordion-btn" aria-expanded="false">
+                    <span>💱 Currency Exchange</span><span class="accordion-icon">+</span>
+                </button>
+                <div class="sub-accordion-body">
+                    <p>Swap diamonds for in-game money or buy them back:</p>
+                    <ul class="rule-list">
+                        <li>Sell 1 diamond → <strong>€1,000</strong></li>
+                        <li>Sell 1 diamond block (9 diamonds) → <strong>€10,000</strong></li>
+                        <li>Buy 1 diamond back → <strong>€1,200</strong></li>
+                    </ul>
+                    <p>The exchange also contains an <strong>Ender Chest</strong> for safe item storage.</p>
+                    <div class="spawn-img-wrap">
+                        <a href="{{ url_for('static', filename='images/CurrencyExchange_big.png') }}" target="_blank" title="Click to enlarge">
+                            <img src="{{ url_for('static', filename='images/CurrencyExchange.png') }}" alt="Currency exchange and ender chest" class="spawn-img spawn-img--half">
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Random Teleport -->
+            <div class="sub-accordion-item">
+                <button class="sub-accordion-btn" aria-expanded="false">
+                    <span>🎲 Random Teleport</span><span class="accordion-icon">+</span>
+                </button>
+                <div class="sub-accordion-body">
+                    <p>Teleports you to a random location between <strong>500 and 1,500 blocks</strong> from Spawn. Ideal for finding unclaimed land to settle in.</p>
+                    <div class="spawn-img-wrap">
+                        <a href="{{ url_for('static', filename='images/RandomTeleport_big.png') }}" target="_blank" title="Click to enlarge">
+                            <img src="{{ url_for('static', filename='images/RandomTeleport.png') }}" alt="Random teleport station" class="spawn-img spawn-img--half">
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Item Disposal -->
+            <div class="sub-accordion-item">
+                <button class="sub-accordion-btn" aria-expanded="false">
+                    <span>🗑️ Item Disposal</span><span class="accordion-icon">+</span>
+                </button>
+                <div class="sub-accordion-body">
+                    <p>A designated spot to discard unwanted items safely, without leaving junk scattered across the world.</p>
+                    <div class="spawn-img-wrap">
+                        <a href="{{ url_for('static', filename='images/ItemDisposal_big.png') }}" target="_blank" title="Click to enlarge">
+                            <img src="{{ url_for('static', filename='images/ItemDisposal.png') }}" alt="Item disposal area" class="spawn-img spawn-img--half">
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bed at Spawn -->
+            <div class="sub-accordion-item">
+                <button class="sub-accordion-btn" aria-expanded="false">
+                    <span>🛏️ Bed at Spawn</span><span class="accordion-icon">+</span>
+                </button>
+                <div class="sub-accordion-body">
+                    <p>Allows players to skip the night without needing a home base — useful for those just starting out.</p>
+                    <div class="spawn-img-wrap">
+                        <a href="{{ url_for('static', filename='images/BedAtSpawn_big.png') }}" target="_blank" title="Click to enlarge">
+                            <img src="{{ url_for('static', filename='images/BedAtSpawn.png') }}" alt="Bed at spawn" class="spawn-img spawn-img--half">
+                        </a>
+                    </div>
+                    <div class="spawn-warning">
+                        ⚠️ <strong>Warning:</strong> If a <strong>[Player]</strong> rank or above uses this bed, it will <strong>override your home bed</strong>. This means <code>/home bed</code> will return you to Spawn instead of your own base. Only use this bed if you have not yet set a home.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Book Shop -->
+    <div class="accordion-item card">
+        <button class="accordion-btn" aria-expanded="false">
+            <span>📚 Book Shop (Enchantments)</span><span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-body">
+            <p>The Book Shop at Spawn sells enchantment books at fixed prices. All books are stocked at their <strong>maximum enchantment level</strong> (e.g. Looting III, Efficiency V).</p>
+
+            <!-- Standard Books -->
+            <div class="sub-accordion-item">
+                <button class="sub-accordion-btn" aria-expanded="false">
+                    <span>📖 Standard Enchantment Books</span><span class="accordion-icon">+</span>
+                </button>
+                <div class="sub-accordion-body">
+                    <p>These books can normally be obtained from <strong>Librarian villagers</strong>. However, due to the server's <strong>trade rebalancing</strong>, each biome's Librarian specialises in different books — for example, a Plains Librarian offers different enchantments than a Desert or Swamp one. The shop provides all of them in one convenient location.</p>
+                    <p>The <strong>last column</strong> contains <strong>Swift Sneak</strong> (levels III, II, and I — top to bottom). Swift Sneak can <strong>only be found in Ancient Cities</strong> and its strength increases with level.</p>
+                    <p>The <strong>last row</strong> also includes <strong>Soul Speed III</strong>, which can only be obtained by <strong>bartering with Piglins</strong> in the Nether.</p>
+                    <div class="spawn-img-wrap">
+                        <a href="{{ url_for('static', filename='images/BookShop_01_big.png') }}" target="_blank" title="Click to enlarge">
+                            <img src="{{ url_for('static', filename='images/BookShop_01.png') }}" alt="Standard enchantment books — biome librarians, Swift Sneak and Soul Speed" class="spawn-img spawn-img--half">
+                        </a>
+                        <p class="spawn-img-caption">Standard books (biome Librarians), Swift Sneak (Ancient City only) and Soul Speed III (Piglin bartering)</p>
+                    </div>
+                    <div class="spawn-warning">
+                        📦 <strong>Stock note:</strong> These shops are currently <strong>out of stock</strong> — they are player-run slots. Any player can claim a free book shop slot and stock it at the listed prices. Contact ADMIN to have ownership transferred.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exclusive Books -->
+            <div class="sub-accordion-item">
+                <button class="sub-accordion-btn" aria-expanded="false">
+                    <span>⭐ Spawn-Exclusive Enchantment Books</span><span class="accordion-icon">+</span>
+                </button>
+                <div class="sub-accordion-body">
+                    <p>This section sells enchantments that <strong>cannot be obtained through regular trading, exploration, or world generation</strong>. The only way to get these is here at Spawn.</p>
+                    <div class="spawn-img-wrap">
+                        <a href="{{ url_for('static', filename='images/BookShop_02_big.png') }}" target="_blank" title="Click to enlarge">
+                            <img src="{{ url_for('static', filename='images/BookShop_02.png') }}" alt="Spawn-exclusive enchantment books" class="spawn-img spawn-img--half">
+                        </a>
+                        <p class="spawn-img-caption">Enchantments unavailable through any other in-game means</p>
+                    </div>
+                    <div class="spawn-warning">
+                        🏪 <strong>Admin shop:</strong> These are <strong>unlimited admin-stocked shops</strong> — they will always have stock available.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Who can sell -->
+            <div class="sub-accordion-item">
+                <button class="sub-accordion-btn" aria-expanded="false">
+                    <span>🤝 Who Can Sell Here?</span><span class="accordion-icon">+</span>
+                </button>
+                <div class="sub-accordion-body">
+                    <p>Any player can list their own books in the Book Shop section, <strong>free of charge</strong>, as long as they agree to sell at the prices listed in the shop. Contact ADMIN to have ownership of the relevant shop slots transferred to you.</p>
+                    <p>If you prefer to set your own prices, you can still sell books through your <strong>10 free player shops</strong> — but those slots are general-purpose and won't earn you additional free shops in the dedicated book section.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trim & Netherite Shops -->
+    <div class="accordion-item card">
+        <button class="accordion-btn" aria-expanded="false">
+            <span>🔱 Armour Trims &amp; Netherite Upgrade Templates</span><span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-body">
+            <p>Spawn stocks both <strong>Armour Trim Smithing Templates</strong> and <strong>Netherite Upgrade Templates</strong> at fixed prices.</p>
+
+            <!-- Pricing -->
+            <div class="sub-accordion-item">
+                <button class="sub-accordion-btn" aria-expanded="false">
+                    <span>💎 Pricing</span><span class="accordion-icon">+</span>
+                </button>
+                <div class="sub-accordion-body">
+                    <ul class="rule-list">
+                        <li>Buying one template costs <strong>1 Diamond Block (€10,000)</strong></li>
+                        <li>The seller receives a <strong>bonus of 2 diamonds (~€3,000)</strong> on top of the base price</li>
+                        <li>Duplicating any template costs <strong>7 diamonds</strong> (standard vanilla crafting)</li>
+                    </ul>
+                    <div class="spawn-img-row">
+                        <div class="spawn-img-wrap spawn-img-wrap--half">
+                            <a href="{{ url_for('static', filename='images/TrimShop_big.png') }}" target="_blank" title="Click to enlarge">
+                                <img src="{{ url_for('static', filename='images/TrimShop.png') }}" alt="Armour trim templates shop" class="spawn-img">
+                            </a>
+                            <p class="spawn-img-caption">Armour Trim Templates</p>
+                        </div>
+                        <div class="spawn-img-wrap spawn-img-wrap--half">
+                            <a href="{{ url_for('static', filename='images/NetheriteShop_big.png') }}" target="_blank" title="Click to enlarge">
+                                <img src="{{ url_for('static', filename='images/NetheriteShop.png') }}" alt="Netherite upgrade template shop" class="spawn-img">
+                            </a>
+                            <p class="spawn-img-caption">Netherite Upgrade Templates</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Who can sell -->
+            <div class="sub-accordion-item">
+                <button class="sub-accordion-btn" aria-expanded="false">
+                    <span>🤝 Who Can Sell Here?</span><span class="accordion-icon">+</span>
+                </button>
+                <div class="sub-accordion-body">
+                    <p>Any player can sell their templates in this section at <strong>no charge</strong>, provided they agree to the listed prices. Contact ADMIN to have shop ownership transferred to you.</p>
+                    <div class="spawn-warning">
+                        📦 <strong>Stock note:</strong> Template shops are currently <strong>out of stock</strong> — any player can claim a free template shop slot and stock it at the listed prices.
+                    </div>
+                    <p>If you prefer different prices, you may use your <strong>10 free general shops</strong> instead — but those will not count towards additional slots in the template section.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Free Player Shops -->
+    <div class="accordion-item card">
+        <button class="accordion-btn" aria-expanded="false">
+            <span>🎁 Free Player Shops</span><span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-body">
+            <p>Every player is entitled to <strong>10 free general-purpose shops</strong> at Spawn, at no cost.</p>
+
+            <!-- What can be sold -->
+            <div class="sub-accordion-item">
+                <button class="sub-accordion-btn" aria-expanded="false">
+                    <span>🛒 What Can Be Sold?</span><span class="accordion-icon">+</span>
+                </button>
+                <div class="sub-accordion-body">
+                    <p>You can sell <strong>anything you like</strong> in your 10 free shops — there are no restrictions on item type or price. This includes enchantment books and smithing templates at your own prices, if you prefer not to use the dedicated sections at the fixed rates.</p>
+                    <div class="spawn-img-wrap">
+                        <a href="{{ url_for('static', filename='images/FreePlayerShop_big.png') }}" target="_blank" title="Click to enlarge">
+                            <img src="{{ url_for('static', filename='images/FreePlayerShop.png') }}" alt="10 free player shop slots" class="spawn-img spawn-img--half">
+                        </a>
+                        <p class="spawn-img-caption">The 10 free shop slots available per player</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- How to get your shops -->
+            <div class="sub-accordion-item">
+                <button class="sub-accordion-btn" aria-expanded="false">
+                    <span>📋 How to Get Your Shops</span><span class="accordion-icon">+</span>
+                </button>
+                <div class="sub-accordion-body">
+                    <p>Contact <strong>ADMIN</strong>, who will transfer block ownership of the 10 slots to you. From there, you're free to set up QuickShop listings as you see fit.</p>
+                </div>
+            </div>
+
+            <!-- Capacity -->
+            <div class="sub-accordion-item">
+                <button class="sub-accordion-btn" aria-expanded="false">
+                    <span>📊 Total Capacity</span><span class="accordion-icon">+</span>
+                </button>
+                <div class="sub-accordion-body">
+                    <p>There are currently <strong>19 groups of 10 shops</strong>, for a total of 190 slots. This can be expanded if more players join — the server is designed to support up to <strong>20 simultaneous players</strong>.</p>
+                    <div class="spawn-img-wrap">
+                        <a href="{{ url_for('static', filename='images/19_FreePlayerShops_big.png') }}" target="_blank" title="Click to enlarge">
+                            <img src="{{ url_for('static', filename='images/19_FreePlayerShops.png') }}" alt="Overview of all 19 groups of free player shops" class="spawn-img">
+                        </a>
+                        <p class="spawn-img-caption">All 19 groups of 10 free shops — expandable as the community grows</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Spawn Peninsula — Player Game Shops -->
+    <div class="accordion-item card">
+        <button class="accordion-btn" aria-expanded="false">
+            <span>🏗️ Spawn Peninsula — Player Game Shops</span><span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-body">
+            <p>The <strong>Spawn Peninsula</strong> is the designated district where players can build and run their own in-game shops, attracting customers from across the server.</p>
+
+            <div class="spawn-img-wrap">
+                <a href="{{ url_for('static', filename='images/SpawnAreaPeninsula_big.png') }}" target="_blank" title="Click to enlarge">
+                    <img src="{{ url_for('static', filename='images/SpawnAreaPeninsula.png') }}" alt="Spawn Peninsula — player shop district" class="spawn-img">
+                </a>
+                <p class="spawn-img-caption">The Spawn Peninsula — community shop district (click to enlarge)</p>
+            </div>
+
+            <!-- How to request -->
+            <div class="sub-accordion-item">
+                <button class="sub-accordion-btn" aria-expanded="false">
+                    <span>📋 How to Get a Plot</span><span class="accordion-icon">+</span>
+                </button>
+                <div class="sub-accordion-body">
+                    <ol class="rule-list">
+                        <li><strong>Create a claim</strong> somewhere in the world to build your shop safely.</li>
+                        <li><strong>Build your shop</strong> — including the chest — but <em>do not create QuickShop listings yet</em>.</li>
+                        <li><strong>Request a plot</strong> on the Peninsula from ADMIN.</li>
+                        <li>After payment is deducted, ADMIN uses <strong>WorldEdit</strong> to move the shop to the Peninsula.</li>
+                        <li>Once moved, <strong>items, prices, and shop ownership</strong> are transferred to you.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- Pricing -->
+            <div class="sub-accordion-item">
+                <button class="sub-accordion-btn" aria-expanded="false">
+                    <span>💎 Pricing</span><span class="accordion-icon">+</span>
+                </button>
+                <div class="sub-accordion-body">
+                    <ul class="rule-list">
+                        <li>A <strong>10×10 block area</strong> costs <strong>€10,000</strong></li>
+                        <li>Any additional blocks cost <strong>€100 per block</strong></li>
+                        <li>The plot is always billed as a <strong>rectangle</strong></li>
+                    </ul>
+                    <div class="spawn-warning">
+                        💡 <strong>Note:</strong> Having your shop at Spawn is optional — you can operate shops anywhere on the map. However, <strong>being at Spawn will attract significantly more customers</strong> since all players pass through here.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Sub-accordion styles */
+.sub-accordion-item {
+    border: 1px solid var(--border-color, rgba(255,255,255,0.1));
+    border-radius: 6px;
+    margin: 0.6rem 0;
+    overflow: hidden;
+}
+.sub-accordion-btn {
+    width: 100%;
+    background: var(--card-bg, rgba(255,255,255,0.04));
+    border: none;
+    padding: 0.65rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: inherit;
+    text-align: left;
+    transition: background 0.2s;
+}
+.sub-accordion-btn:hover {
+    background: var(--hover-bg, rgba(255,255,255,0.08));
+}
+.sub-accordion-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease;
+    padding: 0 1rem;
+}
+.sub-accordion-body > *:first-child { margin-top: 0.75rem; }
+.sub-accordion-body > *:last-child  { margin-bottom: 0.75rem; }
+
+/* Image helpers */
+.spawn-img-wrap {
+    margin: 1rem 0;
+    text-align: center;
+}
+.spawn-img-wrap--half {
+    flex: 1 1 45%;
+    max-width: 48%;
+}
+.spawn-img {
+    max-width: 100%;
+    border-radius: 8px;
+    border: 1px solid var(--border-color, #333);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+.spawn-img:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+    border-color: var(--yellow-title, #f0a500);
+}
+.spawn-img--half {
+    max-width: 50%;
+}
+.spawn-img-caption {
+    font-size: 0.82rem;
+    opacity: 0.7;
+    margin-top: 0.35rem;
+    font-style: italic;
+}
+.spawn-img-row {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 1rem 0;
+}
+.spawn-warning {
+    background: rgba(255, 200, 60, 0.12);
+    border-left: 4px solid #f0a500;
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    margin-top: 1rem;
+    font-size: 0.95rem;
+}
+</style>
+
+<script>
+/**
+ * Opens or closes an accordion body.
+ * When opening: animate from 0 → scrollHeight, then set to 'none' so that
+ * content which loads after the click (images) is never clipped.
+ * When closing: if max-height is 'none' we must first lock it to a px value,
+ * force a reflow, then set to 0 so the close animation plays correctly.
+ */
+function setAccordionOpen(btn, body, isOpen) {
+    if (!isOpen) {
+        // OPENING
+        body.style.maxHeight = body.scrollHeight + 'px';
+        body.addEventListener('transitionend', function handler() {
+            // Only unlock if the user hasn't closed it during the transition
+            if (btn.getAttribute('aria-expanded') === 'true') {
+                body.style.maxHeight = 'none';
+            }
+            body.removeEventListener('transitionend', handler);
+        });
+    } else {
+        // CLOSING — if max-height is 'none' we need an explicit px value first
+        if (body.style.maxHeight === 'none' || body.style.maxHeight === '') {
+            body.style.maxHeight = body.scrollHeight + 'px';
+            body.getBoundingClientRect(); // force reflow so transition fires
+        }
+        body.style.maxHeight = '0';
+    }
+}
+
+// ── Outer accordions ─────────────────────────────────────────────────────────
+document.querySelectorAll('.accordion-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const body = btn.parentElement.querySelector('.accordion-body');
+        const icon = btn.querySelector('.accordion-icon');
+        const isOpen = btn.getAttribute('aria-expanded') === 'true';
+        btn.setAttribute('aria-expanded', String(!isOpen));
+        icon.textContent = isOpen ? '+' : '−';
+        setAccordionOpen(btn, body, isOpen);
+    });
+});
+
+// ── Sub-accordions ────────────────────────────────────────────────────────────
+document.querySelectorAll('.sub-accordion-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const body = btn.parentElement.querySelector('.sub-accordion-body');
+        const icon = btn.querySelector('.accordion-icon');
+        const isOpen = btn.getAttribute('aria-expanded') === 'true';
+        btn.setAttribute('aria-expanded', String(!isOpen));
+        icon.textContent = isOpen ? '+' : '−';
+        setAccordionOpen(btn, body, isOpen);
+
+        // Unlock the outer body so images that load later don't get clipped
+        const outerBody = btn.closest('.accordion-body');
+        if (outerBody) {
+            outerBody.style.maxHeight = 'none';
+        }
+    });
+});
+</script>
