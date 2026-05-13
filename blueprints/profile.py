@@ -9,7 +9,6 @@ from flask import (
     flash,
 )
 from markupsafe import Markup
-from pprint import pprint
 from math import ceil
 
 from mysql.DBhelpers import get_user_profile_tier1, update_mc_stats
@@ -75,29 +74,41 @@ def profile():
         if last_online_dt:
             last_online_display = format_data(last_online_dt)
 
-        if ign and mc_status.get("online"):
+        if ign and (mc_status.get("online") or True): # Try RCON if server might be online
             rcon_stats = get_player_stats(ign)
             if rcon_stats and rcon_stats.get("uuid") != "NA":
                 stats = rcon_stats
-                # Update last online if player is actually in the server list
+                # Update last online if RCON says they are online
                 current_time = datetime.now()
-                is_online_now = ign.lower() in [p.lower() for p in mc_status.get("players_list", [])]
                 
-                if is_online_now:
+                if stats.get("is_online"):
                     last_online_display = "Now"
                     last_online_val = current_time
+                    
+                    # Sync stats to DB ONLY while online to preserve them when offline
+                    update_mc_stats(
+                        email, 
+                        stats["uuid"], 
+                        stats["rank"], 
+                        stats["bank"], 
+                        stats["claims"], 
+                        last_online_val
+                    )
                 else:
+                    # Player is offline. Use values from the database (already in session metadata)
+                    stats["rank"] = session["metadata"].get("mc_rank") or "NA"
+                    stats["bank"] = session["metadata"].get("mc_bank") or "0.0"
+                    stats["claims"] = session["metadata"].get("mc_claims") or "NA"
+                    
+                    # If RCON returned an 'ago' string from /seen, use it for display
+                    if "ago" in str(stats.get("last_online", "")):
+                        last_online_display = stats["last_online"]
+                    
+                    # Keep the timestamp value we loaded from the DB earlier
                     last_online_val = last_online_dt
-                
-                # Sync to DB
-                update_mc_stats(
-                    email, 
-                    stats["uuid"], 
-                    stats["rank"], 
-                    stats["bank"], 
-                    stats["claims"], 
-                    last_online_val
-                )
+            else:
+                # If RCON failed, keep the DB value
+                last_online_val = last_online_dt
         
         # Merge mc_status into metadata for the template
         session["metadata"]["mc_status"] = mc_status

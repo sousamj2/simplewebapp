@@ -1,4 +1,4 @@
-from .pages import bp_home, bp_calendar, bp_adminDB, bp_rules, bp_commands, bp_tiers, bp_support, bp_getting_started
+from .pages import bp_home, bp_calendar, bp_adminDB, bp_rules, bp_commands, bp_tiers, bp_support, bp_getting_started, bp_spawn
 from .profile import bp_profile
 
 __all__ = [
@@ -11,4 +11,5 @@ __all__ = [
     "bp_tiers",
     "bp_support",
     "bp_getting_started",
+    "bp_spawn",
 ]

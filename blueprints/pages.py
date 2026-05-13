@@ -1,7 +1,6 @@
 
 from flask import Blueprint, render_template, session, redirect, url_for, current_app
 from markupsafe import Markup
-from pprint import pprint
 
 from simplewebapp.Funhelpers.render_profile_template import render_profile_template
 from simplewebapp.Funhelpers.mc_server_status import get_mc_status
@@ -15,6 +14,7 @@ bp_commands = Blueprint('commands', __name__, url_prefix='/available_commands')
 bp_tiers = Blueprint('tiers', __name__, url_prefix='/tiers')
 bp_support = Blueprint('support', __name__, url_prefix='/support')
 bp_getting_started = Blueprint('getting_started', __name__, url_prefix='/getting-started')
+bp_spawn = Blueprint('spawn', __name__, url_prefix='/spawn')
 
 def render_page(blueprint, route="/", template_name="home", page_title="Mostly Jovial Crafters", title="Mostly Jovial Crafters", metadata=None):
     """
@@ -80,6 +80,7 @@ render_page(bp_commands, route="/", template_name="available_commands", page_tit
 render_page(bp_tiers, route="/", template_name="tiers", page_title="Tiers", title="Tiers", metadata={})
 render_page(bp_support, route="/", template_name="support", page_title="Support", title="Support", metadata={})
 render_page(bp_getting_started, route="/", template_name="getting_started", page_title="Getting Started", title="Getting Started", metadata={})
+render_page(bp_spawn, route="/", template_name="spawn", page_title="Spawn Area", title="Spawn Area", metadata={})
 # render_page(pages_bp,route="/signin"  , template_name="signin"   , page_title="Explicações em Lisboa", title="Explicações em Lisboa",metadata={})
 # render_page(pages_bp,route="/signup"  , template_name="signup"   , page_title="Explicações em Lisboa", title="Explicações em Lisboa",metadata={})
 # render_page(pages_bp,route="/logout"  , template_name="logout"   , page_title="Explicações em Lisboa", title="Explicações em Lisboa",metadata={})

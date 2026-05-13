@@ -45,11 +45,12 @@ if __name__ == '__main__':
     
     serve(
         app, 
-        host='0.0.0.0', 
-        # host='localhost', 
+        host='*', 
         port=port, 
         threads=8, 
         channel_timeout=120, 
         connection_limit=100, 
-        backlog=2048
+        backlog=2048,
+        trusted_proxy='*', # Trust headers from all proxies (since we handle it via ProxyFix)
+        trusted_proxy_headers=['x-forwarded-for', 'x-forwarded-proto', 'x-forwarded-host', 'x-forwarded-port']
     )

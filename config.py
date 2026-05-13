@@ -80,7 +80,13 @@ def _load_from_ssm(prefix: str = f"/{APP_ENV}/") -> Dict[str, str]:
 
 def _settings() -> Dict[str, str]:
     if _is_aws_host():
-        return _load_from_ssm(prefix=os.getenv("SSM_PREFIX", f"/{APP_ENV}/"))
+        try:
+            print("[CONFIG] Attempting to load mc_mjcrafts credentials from AWS SSM Parameter Store...", flush=True)
+            return _load_from_ssm(prefix=os.getenv("SSM_PREFIX", f"/{APP_ENV}/"))
+        except Exception as e:
+            print(f"[CONFIG] WARNING: AWS SSM Parameter Store is unavailable. Falling back to local .env variables. Error: {e}", flush=True)
+            
+    print("[CONFIG] Loading mc_mjcrafts credentials from local .env", flush=True)
     return _load_from_env()
 
 # Centralized lookup dictionary
@@ -105,14 +111,14 @@ class Config:
     DATABASE_URI = _get("DATABASE_URI", "sqlite:///default.db")
 
     # OAuth2 (Google)
-    CLIENT_ID = _get("SECRET_CLIENT_KEY")
-    CLIENT_SECRET = _get("SECRET_CLIENT_SECRET")
+    CLIENT_ID = _get("MC_SECRET_CLIENT_KEY") or _get("SECRET_CLIENT_KEY")
+    CLIENT_SECRET = _get("MC_SECRET_CLIENT_SECRET") or _get("SECRET_CLIENT_SECRET")
 
     # print(CLIENT_ID)
     # print(CLIENT_SECRET)
 
     # Use separate redirect for production if provided, else default local
-    REDIRECT_URI = _get("OAUTH_REDIRECT_URI", "http://localhost:8080/oauth2callback")
+    REDIRECT_URI = _get("MC_OAUTH_REDIRECT_URI") or _get("OAUTH_REDIRECT_URI", "http://localhost:8081/oauth2callback")
 
     AUTHORIZATION_URL = "https://accounts.google.com/o/oauth2/v2/auth"
     TOKEN_URL = "https://oauth2.googleapis.com/token"
@@ -148,11 +154,16 @@ class Config:
     }
 
     # RDS Connection to MySQL
-    MYSQL_PASSWORD = _get("MYSQL_PASSWORD")
-    MYSQL_HOST     = _get("MYSQL_HOST")
-    MYSQL_USER     = _get("MYSQL_USER", "admin")
-    MYSQL_DBNAME   = _get("MYSQL_DBNAME", "explicolivais")
-    MYSQL_PORT     = int(_get("MYSQL_PORT", "3306"))
+    MYSQL_PASSWORD = _get("MC_MYSQL_PASSWORD") or _get("MYSQL_PASSWORD")
+    MYSQL_HOST     = _get("MC_MYSQL_HOST") or _get("MYSQL_HOST")
+    MYSQL_USER     = _get("MC_MYSQL_USER") or _get("MYSQL_USER") or "admin"
+    MYSQL_DBNAME   = _get("MC_MYSQL_DBNAME") or "mc_mjcrafts"
+    MYSQL_PORT     = int(_get("MC_MYSQL_PORT") or _get("MYSQL_PORT") or "3306")
+
+    if not MYSQL_PASSWORD or not MYSQL_USER:
+        print("[CONFIG] CRITICAL ERROR: mc_mjcrafts Database credentials (MYSQL_USER or MYSQL_PASSWORD) are missing. Please check AWS SSM or local .env.", flush=True)
+        import sys
+        sys.exit(1)
 
     # RCON Config
     RCON_HOST = _get("RCON_HOST", "35.210.3.240")

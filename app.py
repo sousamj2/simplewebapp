@@ -5,7 +5,6 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../mysql')))
 
 from flask import Flask, redirect, render_template
-from pprint import pprint
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 from dotenv import load_dotenv
@@ -20,7 +19,7 @@ from mailinteraction import bp_register, bp_request_new_user
 from blueprints import (
     bp_home, bp_profile, 
     bp_calendar, bp_adminDB,
-    bp_rules, bp_commands, bp_tiers, bp_support, bp_getting_started
+    bp_rules, bp_commands, bp_tiers, bp_support, bp_getting_started, bp_spawn
 )
 from Funhelpers.mc_colors import mc_to_html
 
@@ -40,6 +39,7 @@ def create_app(config_name=None):
     # Load configuration
     from config import config
     app.config.from_object(config[config_name])
+    app.config["PREFERRED_URL_SCHEME"] = "https"
     
     # Initialize Flask-Mail via the extension pattern to avoid assigning new attributes on Flask
     mail.init_app(app)
@@ -72,6 +72,23 @@ def create_app(config_name=None):
     app.register_blueprint(bp_tiers)
     app.register_blueprint(bp_support)
     app.register_blueprint(bp_getting_started)
+    app.register_blueprint(bp_spawn)
+    
+    @app.context_processor
+    def inject_copyright():
+        from flask import request
+        host = request.host
+        
+        # Determine display name based on domain
+        if "matematica.pt" in host:
+            display_name = "MATEMATICA.PT"
+        else:
+            display_name = "MJCRAFTS.PT"
+            
+        return {
+            'current_year': 2026,
+            'copyright_name': display_name
+        }
     
     
     # Main route: redirect to /pages/ (home)

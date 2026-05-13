@@ -22,19 +22,17 @@ def run_rcon_command(command):
     Avoids signal issues found in some libraries.
     """
     host = current_app.config.get("RCON_HOST", "35.210.3.240")
+    # Strip brackets if present (common for IPv6 in URLs/configs)
+    host = host.strip("[]")
     port = current_app.config.get("RCON_PORT", 25575)
     password = current_app.config.get("RCON_PASSWORD")
     
     if not password:
         return "Error: RCON password not configured"
         
-    # print(f"DEBUG RCON: Attempting connection to {host}:{port}", flush=True)
-    
     try:
-        # Create socket
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(5)
-        sock.connect((host, port))
+        # Create connection (handles both IPv4 and IPv6 automatically)
+        sock = socket.create_connection((host, port), timeout=5)
         
         def send_packet(packet_type, payload):
             # Packet structure: Length (4) | Request ID (4) | Type (4) | Payload (N) | 2 null bytes (2)
@@ -58,11 +56,9 @@ def run_rcon_command(command):
         _, _, response = send_packet(2, command)
         
         sock.close()
-        print(f"DEBUG RCON: Response: {response.strip()}", flush=True)
         return response.strip()
         
     except Exception as e:
-        print(f"DEBUG RCON: Error: {str(e)}", flush=True)
         return f"Error: {str(e)}"
 
 def get_player_stats(player_name):
@@ -73,12 +69,29 @@ def get_player_stats(player_name):
     if not player_name:
         return {}
         
+    # 1. Check if player is actually online using 'list' command
+    online_res = run_rcon_command("list")
+    is_online = False
+    if online_res and "Error" not in online_res:
+        # Strip color codes from the list response
+        clean_list = strip_mc_codes(online_res)
+        
+        # 'list' usually returns: "There are 1 of 20 players online: player1, player2"
+        # Or: "Admins: ADMIN mjsousa"
+        if ":" in clean_list:
+            # We look at the entire part after the first colon to be safe with multiline responses
+            players_part = clean_list.split(":", 1)[1].lower()
+            is_online = player_name.lower() in players_part
+        else:
+            is_online = player_name.lower() in clean_list.lower()
+
     placeholders = {
         "uuid": "%player_uuid%",
         "rank": "%luckperms_prefix%",
         "bank": "%vault_eco_balance%",
         "rem_claims": "%griefprevention_remainingclaims%",
-        "total_claims": "%griefprevention_claims%"
+        "total_claims": "%griefprevention_claims%",
+        "last_online": "%essentials_last_login_date%"
     }
     
     raw_stats = {}
@@ -90,12 +103,35 @@ def get_player_stats(player_name):
         else:
             raw_stats[key] = "NA"
             
+    # 3. Fallback: If UUID or last_online is NA, try to get it from 'seen' command
+    if raw_stats["uuid"] == "NA" or raw_stats["last_online"] == "NA":
+        seen_res_raw = run_rcon_command(f"seen {player_name}")
+        if seen_res_raw and "Error" not in seen_res_raw:
+            seen_res = strip_mc_codes(seen_res_raw)
+            import re
+            # Extract UUID
+            if raw_stats["uuid"] == "NA":
+                match_uuid = re.search(r"UUID:\s*([a-f0-9\-]+)", seen_res)
+                if match_uuid:
+                    raw_stats["uuid"] = match_uuid.group(1)
+            
+            # Extract "offline since X"
+            if raw_stats["last_online"] == "NA":
+                # Look for "offline since 6 seconds" or similar
+                match_seen = re.search(r"offline since (.*)", seen_res, re.IGNORECASE)
+                if match_seen:
+                    raw_stats["last_online"] = f"{match_seen.group(1).split('.')[0].strip()} ago"
+                elif "online since" in seen_res.lower():
+                    raw_stats["last_online"] = "Now"
+
     # Format claims
     stats = {
         "uuid": raw_stats["uuid"],
         "rank": strip_mc_codes(raw_stats["rank"]),
         "bank": raw_stats["bank"],
-        "claims": f"{raw_stats['rem_claims']}/{raw_stats['total_claims']}" if raw_stats['rem_claims'] != "NA" else "NA"
+        "claims": f"{raw_stats['rem_claims']}/{raw_stats['total_claims']}" if raw_stats['rem_claims'] != "NA" else "NA",
+        "last_online": raw_stats["last_online"],
+        "is_online": is_online
     }
             
     return stats
