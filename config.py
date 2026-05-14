@@ -125,13 +125,12 @@ class Config:
     SCOPE = "openid email profile"
 
     # Mail (no-reply)
-    MAIL_SERVER = _get("MAIL_SERVER")
+    MAIL_SERVER = _get("MC_MAIL_SERVER")
     MAIL_PORT = int(_get("MAIL_PORT", "465"))
     MAIL_USE_SSL = (_get("MAIL_USE_SSL", "True") == "True")
-    MAIL_USERNAME = _get("MAIL_USERNAME")
-    MAIL_PASSWORD = _get("MAIL_PASSWORD")
-    MAIL_DEFAULT_SENDER = _get("MAIL_DEFAULT_SENDER")
-    MAIL_ALLOCATE_IPV4 = (_get("MAIL_ALLOCATE_IPV4", "False") == "True")
+    MAIL_USERNAME = _get("MC_MAIL_USERNAME")
+    MAIL_PASSWORD = _get("MC_MAIL_PASSWORD")
+    MAIL_DEFAULT_SENDER = _get("MC_MAIL_DEFAULT_SENDER")
 
     # Optional secondary secret items
     SECURITY_PASSWORD_SALT = _get("SECURITY_PASSWORD_SALT")
