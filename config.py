@@ -131,6 +131,7 @@ class Config:
     MAIL_USERNAME = _get("MAIL_USERNAME")
     MAIL_PASSWORD = _get("MAIL_PASSWORD")
     MAIL_DEFAULT_SENDER = _get("MAIL_DEFAULT_SENDER")
+    MAIL_ALLOCATE_IPV4 = (_get("MAIL_ALLOCATE_IPV4", "False") == "True")
 
     # Optional secondary secret items
     SECURITY_PASSWORD_SALT = _get("SECURITY_PASSWORD_SALT")
