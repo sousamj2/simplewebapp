@@ -35,6 +35,21 @@ if [[ "${APP_ENV}" == "dev" ]]; then
         # Ensure Docker is up (using docker-compose for compatibility)
         echo -e "${YELLOW}🐳 Ensuring Docker containers are up...${NC}"
         (cd .. && docker-compose up -d || docker compose up -d)
+
+        # Wait for MariaDB to be ready
+        echo -e "${YELLOW}⏳ Waiting for MariaDB to be ready...${NC}"
+        for i in {1..30}; do
+            if [[ "$OSTYPE" == "darwin"* ]]; then
+                 # MacOS version of nc
+                 nc -z -w 1 localhost 3307 && break
+            else
+                 # Linux version of nc
+                 nc -z localhost 3307 && break
+            fi
+            echo -n "."
+            sleep 1
+        done
+        echo ""
     fi
 fi
 
