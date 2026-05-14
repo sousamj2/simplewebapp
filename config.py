@@ -79,15 +79,20 @@ def _load_from_ssm(prefix: str = f"/{APP_ENV}/") -> Dict[str, str]:
     return params
 
 def _settings() -> Dict[str, str]:
+    # Always load .env as baseline (ports, RCON, GCP, local-only config)
+    print("[CONFIG] Loading baseline config from local .env", flush=True)
+    settings = _load_from_env()
+
     if _is_aws_host():
         try:
-            print("[CONFIG] Attempting to load mc_mjcrafts credentials from AWS SSM Parameter Store...", flush=True)
-            return _load_from_ssm(prefix=os.getenv("SSM_PREFIX", f"/{APP_ENV}/"))
+            print("[CONFIG] Overlaying credentials from AWS SSM Parameter Store...", flush=True)
+            ssm_params = _load_from_ssm(prefix=os.getenv("SSM_PREFIX", f"/{APP_ENV}/"))
+            settings.update(ssm_params)  # SSM values take priority over .env
+            print(f"[CONFIG] Loaded {len(ssm_params)} parameter(s) from AWS SSM", flush=True)
         except Exception as e:
-            print(f"[CONFIG] WARNING: AWS SSM Parameter Store is unavailable. Falling back to local .env variables. Error: {e}", flush=True)
-            
-    print("[CONFIG] Loading mc_mjcrafts credentials from local .env", flush=True)
-    return _load_from_env()
+            print(f"[CONFIG] WARNING: AWS SSM unavailable, using .env only. Error: {e}", flush=True)
+
+    return settings
 
 # Centralized lookup dictionary
 SETTINGS = _settings()
