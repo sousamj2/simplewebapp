@@ -110,6 +110,7 @@ def main():
     parser.add_argument('--zone', default=ZONE)
     parser.add_argument('--project', default=None)
     parser.add_argument('--shutdown-script', default=REMOTE_SHUTDOWN_SCRIPT)
+    parser.add_argument('--archive-script', help='Deprecated: Archival is now handled by the shutdown script.')
     parser.add_argument('--state-file', default=STATE_FILE)
     parser.add_argument('--dry-run', action='store_true')
     parser.add_argument('--summary', action='store_true')
