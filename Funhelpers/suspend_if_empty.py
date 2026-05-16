@@ -17,8 +17,13 @@ if str(app_root) not in sys.path:
 if str(script_dir.parent) not in sys.path:
     sys.path.insert(0, str(script_dir.parent))
 
+# Fallback for SECRET_KEY to prevent ValueError during import of app
+import os
+if not os.environ.get('SECRET_KEY') and not os.environ.get('FLASK_SECRET_KEY'):
+    os.environ['SECRET_KEY'] = 'dummy_key_for_suspend_script'
+
 from mysql.DBhelpers import update_mc_stats, getEmailFromIgn
-from simplewebapp.app import create_app
+from simplewebapp.app import app
 
 STATE_FILE = Path('/var/www/appmodules/simplewebapp/scripts/suspend_if_empty_state.json')
 INSTANCE_NAME = 'mcserver-mem8'
@@ -159,7 +164,6 @@ def main():
     action = None
 
     if should_suspend:
-        app = create_app()
         with app.app_context():
             # 1. Sync stats to DB first while we have the file!
             sync_cache_to_db(args.instance, args.zone, args.project)
