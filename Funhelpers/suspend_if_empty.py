@@ -17,13 +17,7 @@ if str(app_root) not in sys.path:
 if str(script_dir.parent) not in sys.path:
     sys.path.insert(0, str(script_dir.parent))
 
-# Fallback for SECRET_KEY to prevent ValueError during import of app
-import os
-if not os.environ.get('SECRET_KEY') and not os.environ.get('FLASK_SECRET_KEY'):
-    os.environ['SECRET_KEY'] = 'dummy_key_for_suspend_script'
-
 from mysql.DBhelpers import update_mc_stats, getEmailFromIgn
-from simplewebapp.app import app
 
 STATE_FILE = Path('/var/www/appmodules/simplewebapp/scripts/suspend_if_empty_state.json')
 INSTANCE_NAME = 'mcserver-mem8'
@@ -164,23 +158,22 @@ def main():
     action = None
 
     if should_suspend:
-        with app.app_context():
-            # 1. Sync stats to DB first while we have the file!
-            sync_cache_to_db(args.instance, args.zone, args.project)
-            
-            # 2. Trigger the server-side shutdown and archival script
-            # This handles unbanning, whitelist, save, stop, and log archival.
-            shutdown_cmd = gcloud_ssh_command(
-                args.instance,
-                args.zone,
-                f'sudo bash {args.shutdown_script}',
-                args.project,
-            )
-            shutdown_result = run_command(shutdown_cmd, dry_run=args.dry_run)
+        # 1. Sync stats to DB first while we have the file!
+        sync_cache_to_db(args.instance, args.zone, args.project)
+        
+        # 2. Trigger the server-side shutdown and archival script
+        # This handles unbanning, whitelist, save, stop, and log archival.
+        shutdown_cmd = gcloud_ssh_command(
+            args.instance,
+            args.zone,
+            f'sudo bash {args.shutdown_script}',
+            args.project,
+        )
+        shutdown_result = run_command(shutdown_cmd, dry_run=args.dry_run)
 
-            # 3. If shutdown was successful, suspend the VM
-            if shutdown_result.get('ok', False):
-                action = run_gcloud_suspend(args.instance, args.zone, args.project, args.dry_run)
+        # 3. If shutdown was successful, suspend the VM
+        if shutdown_result.get('ok', False):
+            action = run_gcloud_suspend(args.instance, args.zone, args.project, args.dry_run)
 
     result = {
         'measured_at': measured_at,
