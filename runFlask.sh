@@ -12,25 +12,18 @@ NC='\033[0m' # No Color
 # Set environment
 export APP_ENV=dev # Enable SSM loading
 
-# Fetch credentials from SSM early so table creation works
+# Fetch credentials from GCP early so table creation works
 if [[ "${APP_ENV}" == "dev" ]]; then
-    echo -e "${YELLOW}🔐 Fetching credentials from AWS SSM...${NC}"
-    AWS_REGION="eu-south-2"
+    echo -e "${YELLOW}🔐 Fetching configuration from GCP Secret Manager (PASS_CONFIG)...${NC}"
+    PROJECT_ID="minecraft-server-july-12"
+    SECRET_JSON=$(gcloud secrets versions access latest --secret="PASS_CONFIG" --project="${PROJECT_ID}" 2>/dev/null)
     
-    # Exporting these so they are available to the process and any subprocesses
-    export ROOT_MYSQL_PASSWORD=$(aws ssm get-parameter --name "/dev/ROOT_MYSQL_PASSWORD" --with-decryption --query "Parameter.Value" --output text --region $AWS_REGION 2>/dev/null || echo "")
-    export MC_MYSQL_PASSWORD=$(aws ssm get-parameter --name "/dev/MC_MYSQL_PASSWORD" --with-decryption --query "Parameter.Value" --output text --region $AWS_REGION 2>/dev/null || echo "")
-    export EXPL_MYSQL_PASSWORD=$(aws ssm get-parameter --name "/dev/EXPL_MYSQL_PASSWORD" --with-decryption --query "Parameter.Value" --output text --region $AWS_REGION 2>/dev/null || echo "")
-    
-    # Also fetch SECRET_KEY if it's missing in .env
-    if [ -z "$SECRET_KEY" ] && [ -z "$FLASK_SECRET_KEY" ]; then
-         export SECRET_KEY=$(aws ssm get-parameter --name "/dev/SECRET_KEY" --with-decryption --query "Parameter.Value" --output text --region $AWS_REGION 2>/dev/null || echo "")
-    fi
-
-    if [ -z "$ROOT_MYSQL_PASSWORD" ]; then
-        echo -e "${RED}   ✗ Failed to fetch credentials from SSM. Falling back to .env defaults.${NC}"
-    else
-        echo -e "${GREEN}   ✓ Credentials fetched and exported.${NC}"
+    if [ $? -eq 0 ] && [ -n "$SECRET_JSON" ]; then
+        # Export all keys from the JSON as environment variables
+        while IFS='=' read -r key value; do
+            export "$key"="$value"
+        done < <(python3 -c "import json, sys; data = json.loads(sys.stdin.read()); [print(f'{k}={v}') for k, v in data.items()]" <<< "$SECRET_JSON")
+        echo -e "${GREEN}   ✓ Credentials fetched from GCP and exported.${NC}"
         
         # Ensure Docker is up (using docker-compose for compatibility)
         echo -e "${YELLOW}🐳 Ensuring Docker containers are up...${NC}"
@@ -50,6 +43,8 @@ if [[ "${APP_ENV}" == "dev" ]]; then
             sleep 1
         done
         echo ""
+    else
+        echo -e "${RED}   ✗ Failed to fetch credentials from GCP. Falling back to .env defaults.${NC}"
     fi
 fi
 
