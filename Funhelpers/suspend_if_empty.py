@@ -42,6 +42,18 @@ def run_command(cmd, dry_run=False, timeout=180): # Increased timeout for archiv
 
 
 def get_instance_ipv6(instance, zone, project=None):
+    # Try external IPv6 first
+    cmd = f"gcloud compute instances describe {instance} --zone {zone} "
+    if project:
+        cmd += f"--project {project} "
+    cmd += "--format='get(networkInterfaces[0].ipv6AccessConfigs[0].externalIpv6)'"
+    res = run_command(cmd)
+    ext_ipv6 = res.get('stdout', '').strip()
+    
+    if ext_ipv6:
+        return ext_ipv6
+        
+    # Fallback to internal IPv6
     cmd = f"gcloud compute instances describe {instance} --zone {zone} "
     if project:
         cmd += f"--project {project} "
