@@ -41,32 +41,12 @@ def run_command(cmd, dry_run=False, timeout=180): # Increased timeout for archiv
         return {'ok': False, 'stdout': '', 'stderr': str(e), 'returncode': -1}
 
 
-def get_instance_ipv6(instance, zone, project=None):
-    # Try external IPv6 first
-    cmd = f"gcloud compute instances describe {instance} --zone {zone} "
-    if project:
-        cmd += f"--project {project} "
-    cmd += "--format='get(networkInterfaces[0].ipv6AccessConfigs[0].externalIpv6)'"
-    res = run_command(cmd)
-    ext_ipv6 = res.get('stdout', '').strip()
-    
-    if ext_ipv6:
-        return ext_ipv6
-        
-    # Fallback to internal IPv6
-    cmd = f"gcloud compute instances describe {instance} --zone {zone} "
-    if project:
-        cmd += f"--project {project} "
-    cmd += "--format='get(networkInterfaces[0].ipv6Address)'"
-    res = run_command(cmd)
-    return res.get('stdout', '').strip()
-
-
 def gcloud_ssh_command(instance, zone, remote_command, project=None):
-    ipv6 = get_instance_ipv6(instance, zone, project)
-    ip_to_use = ipv6 if ipv6 else "2600:1900:4010:58a::"
-    # Use native SSH with the specific user and resolved (or fallback) IPv6
-    return f"ssh -6 -o StrictHostKeyChecking=no goals_locust8006_eagereverest_co@{ip_to_use} '{remote_command}'"
+    base = f"gcloud compute ssh {instance} --zone {zone} "
+    if project:
+        base += f"--project {project} "
+    base += f"--quiet -- '{remote_command}'"
+    return base
 
 
 def get_instance_status(instance, zone, project=None):
@@ -168,8 +148,6 @@ def main():
         args.project,
     )
     check_result = run_command(check_cmd)
-    print(f"DEBUG: check_cmd={check_cmd}")
-    print(f"DEBUG: check_result={check_result}")
     cache_exists = check_result.get('ok', False)
     
     if not cache_exists:
