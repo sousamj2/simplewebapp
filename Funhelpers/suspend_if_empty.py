@@ -45,7 +45,7 @@ def gcloud_ssh_command(instance, zone, remote_command, project=None):
     base = f"gcloud compute ssh {instance} --zone {zone} "
     if project:
         base += f"--project {project} "
-    base += f"--quiet -- '{remote_command}'"
+    base += f"--quiet -- -6 '{remote_command}'"
     return base
 
 
