@@ -148,6 +148,8 @@ def main():
         args.project,
     )
     check_result = run_command(check_cmd)
+    print(f"DEBUG: check_cmd={check_cmd}")
+    print(f"DEBUG: check_result={check_result}")
     cache_exists = check_result.get('ok', False)
     
     if not cache_exists:

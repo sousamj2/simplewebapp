@@ -14,4 +14,4 @@ fi
   --archive-script /home/minecraft/cronjobs/archive_cronjobs.sh \
   --state-file /var/www/appmodules/simplewebapp/scripts/suspend_if_empty_state.json \
   --summary \
-  > /var/www/appmodules/simplewebapp/scripts/suspend_if_empty.log 2>&1
+  >> /var/www/appmodules/simplewebapp/scripts/suspend_if_empty.log 2>&1
