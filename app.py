@@ -80,10 +80,7 @@ def create_app(config_name=None):
         host = request.host
         
         # Determine display name based on domain
-        if "matematica.pt" in host:
-            display_name = "MATEMATICA.PT"
-        else:
-            display_name = "MJCRAFTS.PT"
+        display_name = "MJCRAFTS.PT"
             
         return {
             'current_year': 2026,

@@ -27,4 +27,9 @@
     color: var(--text-color);
   }
   .main-content h2 { color: var(--link-color); margin-top: 0; }
+
+footer {
+    margin-left: 16px;
+    margin-bottom: 16px;
+}
   
