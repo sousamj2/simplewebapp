@@ -68,7 +68,7 @@ def gcloud_ssh_command(instance, zone, remote_command, project=None):
     if project:
         base += f"--project {project} "
     if ipv6:
-        base += f"--address='{ipv6}' "
+        base += f"--address='[{ipv6}]' "
     base += f"--quiet -- '{remote_command}'"
     return base
 
