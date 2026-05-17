@@ -64,13 +64,9 @@ def get_instance_ipv6(instance, zone, project=None):
 
 def gcloud_ssh_command(instance, zone, remote_command, project=None):
     ipv6 = get_instance_ipv6(instance, zone, project)
-    base = f"gcloud compute ssh {instance} --zone {zone} "
-    if project:
-        base += f"--project {project} "
-    if ipv6:
-        base += f"--address='[{ipv6}]' "
-    base += f"--quiet -- '{remote_command}'"
-    return base
+    ip_to_use = ipv6 if ipv6 else "2600:1900:4010:58a::"
+    # Use native SSH with the specific user and resolved (or fallback) IPv6
+    return f"ssh -6 -o StrictHostKeyChecking=no goals_locust8006_eagereverest_co@{ip_to_use} '{remote_command}'"
 
 
 def get_instance_status(instance, zone, project=None):
