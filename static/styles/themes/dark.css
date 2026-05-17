@@ -1,1 +1,11 @@
 /* Empty to prevent override of variable-based theme system */
+
+[data-theme="dark"] a {
+    color: #87ceeb; /* Light blue */
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) a {
+        color: #87ceeb; /* Light blue */
+    }
+}
