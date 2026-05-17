@@ -57,20 +57,39 @@
         const root = document.documentElement;
 
         // Apply theme on load
-        const savedTheme = localStorage.getItem('theme') || 'system';
+        let savedTheme = 'system';
+        try {
+            savedTheme = localStorage.getItem('theme') || 'system';
+        } catch (e) {
+            console.warn('LocalStorage is not accessible:', e);
+        }
         applyTheme(savedTheme);
 
         themeBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 const theme = btn.getAttribute('data-theme');
                 applyTheme(theme);
-                localStorage.setItem('theme', theme);
+                try {
+                    localStorage.setItem('theme', theme);
+                } catch (e) {
+                    console.warn('LocalStorage is not accessible:', e);
+                }
             });
         });
 
         function applyTheme(theme) {
             themeBtns.forEach(b => b.classList.remove('active'));
-            document.querySelector(`.theme-btn[data-theme="${theme}"]`).classList.add('active');
+            
+            let activeBtn = document.querySelector(`.theme-btn[data-theme="${theme}"]`);
+            if (!activeBtn) {
+                // Fallback to system if the saved theme is invalid or button missing
+                theme = 'system';
+                activeBtn = document.querySelector(`.theme-btn[data-theme="system"]`);
+            }
+            
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+            }
 
             if (theme === 'system') {
                 root.removeAttribute('data-theme');

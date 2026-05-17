@@ -41,11 +41,23 @@ def run_command(cmd, dry_run=False, timeout=180): # Increased timeout for archiv
         return {'ok': False, 'stdout': '', 'stderr': str(e), 'returncode': -1}
 
 
+def get_instance_ipv6(instance, zone, project=None):
+    cmd = f"gcloud compute instances describe {instance} --zone {zone} "
+    if project:
+        cmd += f"--project {project} "
+    cmd += "--format='get(networkInterfaces[0].ipv6Address)'"
+    res = run_command(cmd)
+    return res.get('stdout', '').strip()
+
+
 def gcloud_ssh_command(instance, zone, remote_command, project=None):
+    ipv6 = get_instance_ipv6(instance, zone, project)
     base = f"gcloud compute ssh {instance} --zone {zone} "
     if project:
         base += f"--project {project} "
-    base += f"--quiet -- -6 '{remote_command}'"
+    if ipv6:
+        base += f"--address='{ipv6}' "
+    base += f"--quiet -- '{remote_command}'"
     return base
 
 
