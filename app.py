@@ -4,8 +4,10 @@ import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../mysql')))
 
-from flask import Flask, redirect, render_template
+from flask import Flask, redirect, render_template, request
 from werkzeug.middleware.proxy_fix import ProxyFix
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -40,6 +42,14 @@ def create_app(config_name=None):
     from config import config
     app.config.from_object(config[config_name])
     app.config["PREFERRED_URL_SCHEME"] = "https"
+    
+    # Initialize Rate Limiter
+    limiter = Limiter(
+        get_remote_address,
+        app=app,
+        default_limits=["20 per minute"],
+        default_limits_exempt_when=lambda: request.path.startswith('/static/') or request.method != 'GET'
+    )
     
     # Initialize Flask-Mail via the extension pattern to avoid assigning new attributes on Flask
     mail.init_app(app)
