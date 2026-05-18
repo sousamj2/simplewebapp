@@ -59,6 +59,14 @@ def update_db_before_suspend():
         if simplewebapp_dir not in sys.path:
             sys.path.insert(0, simplewebapp_dir)
             
+        try:
+            from dotenv import load_dotenv
+            env_path = os.path.join(simplewebapp_dir, '.env.gcp')
+            if os.path.exists(env_path):
+                load_dotenv(env_path)
+        except ImportError:
+            pass
+            
         from simplewebapp.app import create_app
         app = create_app()
         
