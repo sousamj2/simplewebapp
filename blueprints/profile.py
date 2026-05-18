@@ -163,13 +163,13 @@ def update_stats():
     mc_host = current_app.config.get("MC_SERVER_HOST", "2600:1900:4010:58a::")
     
     # Common paths for the MC server
-    script_path = "/home/minecraft/server/ingame_scripts/travel_time_report.py"
-    stats_dir = "/home/minecraft/server/world/players/stats"
+    script_path = "/home/sargedas/mcserver/ingame_scripts/travel_time_report.py"
+    stats_dir = "/home/minecraft/world/players/stats"
     remote_tmp = f"/tmp/usecache_db_{ign}.txt"
     
     cmd = [
         "ssh", "-o", "StrictHostKeyChecking=no", f"{mc_user}@{mc_host}",
-        f"python3 {script_path} {stats_dir} --user {ign} --with-rank --export-db {remote_tmp}"
+        f"python3 {script_path} {stats_dir} --server-root /home/minecraft --user {ign} --with-rank --export-db {remote_tmp}"
     ]
     
     try:
