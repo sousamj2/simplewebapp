@@ -187,7 +187,7 @@ def update_stats():
             
         scp_cmd = [
             "scp", "-6", "-o", "StrictHostKeyChecking=no",
-            f"{mc_user}@{mc_host}:{remote_tmp}", local_tmp
+            f"{mc_user}@[{mc_host}]:{remote_tmp}", local_tmp
         ]
         print(f"DEBUG: Running SCP command: {' '.join(scp_cmd)}", flush=True)
         subprocess.run(scp_cmd, check=True, timeout=10)
