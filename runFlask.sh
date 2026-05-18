@@ -32,12 +32,9 @@ if [[ "${APP_ENV}" == "dev" ]]; then
         # Wait for MariaDB to be ready
         echo -e "${YELLOW}⏳ Waiting for MariaDB to be ready...${NC}"
         for i in {1..30}; do
-            if [[ "$OSTYPE" == "darwin"* ]]; then
-                 # MacOS version of nc
-                 nc -z -w 1 localhost 3307 && break
-            else
-                 # Linux version of nc
-                 nc -z localhost 3307 && break
+            # Use pymysql to do a real connection check, as 'nc' succeeds too early due to docker-proxy
+            if ../app-env/bin/python -c "import pymysql, os; pymysql.connect(host=os.getenv('MYSQL_HOST', '127.0.0.1'), port=int(os.getenv('MYSQL_PORT', 3307)), user=os.getenv('MYSQL_USER'), password=os.getenv('MYSQL_PASSWORD'))" 2>/dev/null; then
+                break
             fi
             echo -n "."
             sleep 1
