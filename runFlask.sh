@@ -52,7 +52,7 @@ except Exception:
 " 2>/dev/null; then
                 break
             fi
-            echo -n "$i."
+            echo -n "."
             sleep 1
         done
         echo ""
