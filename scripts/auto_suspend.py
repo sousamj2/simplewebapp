@@ -54,40 +54,46 @@ def update_db_before_suspend():
             print("DEBUG AUTO-SUSPEND: No output received from DB sync. Skipped.")
             return
 
-        updated_count = 0
-        for line in output.splitlines():
-            line = line.strip()
-            if not line or not line.startswith('{'):
-                continue
-            
-            try:
-                data = json.loads(line)
-            except json.JSONDecodeError:
-                continue
+        from simplewebapp.app import create_app
+        app = create_app()
+        
+        with app.app_context():
+            updated_count = 0
+            for line in output.splitlines():
+                line = line.strip()
+                if not line or not line.startswith('{'):
+                    continue
                 
-            ign = data.get('player')
-            if not ign:
-                continue
-            
-            email = getEmailFromIgn(ign)
-            if not email:
-                continue
-            
-            update_mc_stats(
-                email,
-                data.get('uuid', 'NA'),
-                data.get('rank', 'NR'),
-                data.get('bank', '0.0'), 
-                data.get('claims', 'NA'), 
-                data.get('last_online'),
-                data.get('first_login'),
-                data.get('location')
-            )
-            updated_count += 1
-            
-        print(f"DEBUG AUTO-SUSPEND: Successfully updated stats for {updated_count} player(s) in local DB.")
+                try:
+                    data = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                    
+                ign = data.get('player')
+                if not ign:
+                    continue
+                
+                email = getEmailFromIgn(ign)
+                if not email:
+                    continue
+                
+                update_mc_stats(
+                    email,
+                    data.get('uuid', 'NA'),
+                    data.get('rank', 'NR'),
+                    data.get('bank', '0.0'), 
+                    data.get('claims', 'NA'), 
+                    data.get('last_online'),
+                    data.get('first_login'),
+                    data.get('location')
+                )
+                updated_count += 1
+                
+            print(f"DEBUG AUTO-SUSPEND: Successfully updated stats for {updated_count} player(s) in local DB.")
     except Exception as e:
+        import traceback
         print(f"DEBUG AUTO-SUSPEND: Failed to update DB: {e}")
+        traceback.print_exc()
 
 def check_and_suspend():
     print(f"DEBUG AUTO-SUSPEND: [{datetime.now()}] Checking server status...")
