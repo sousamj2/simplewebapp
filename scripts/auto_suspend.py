@@ -40,7 +40,6 @@ def check_and_suspend():
     print(f"DEBUG AUTO-SUSPEND: [{datetime.now()}] Checking server status...")
     
     status = get_mc_status()
-    
     if not status.get("online"):
         print("DEBUG AUTO-SUSPEND: Server is already offline.")
         return

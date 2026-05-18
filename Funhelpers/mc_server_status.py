@@ -6,7 +6,7 @@ def get_mc_status():
     Queries the Minecraft server at mc.mjcrafts.pt using standard SLP (Server List Ping).
     Returns a dictionary with status information.
     """
-    server_address = "mc.mjcrafts.pt"
+    server_address = "mc6.mjcrafts.pt"
     status_dict = {
         "online": False,
         "players_online": 0,
