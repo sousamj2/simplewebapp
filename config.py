@@ -89,6 +89,8 @@ class Config:
 
     # Google Cloud Mail Relay
     GOOGLE_MAIL_RELAY_URL = _get("GOOGLE_MAIL_RELAY_URL", "https://mail-relay-783543567741.europe-southwest1.run.app")
+    MAILSYSTEM = _get("MAILSYSTEM", "GCP")
+    LOCAL_MAIL_RELAY_URL = _get("LOCAL_MAIL_RELAY_URL")
     SECURITY_PASSWORD_SALT = _get("SECURITY_PASSWORD_SALT")
 
     # Google Calendar service account
