@@ -4,9 +4,11 @@ After=network.target
 
 [Service]
 Type=oneshot
-User=sargedas
-WorkingDirectory=/home/sargedas/work/appmodules
-ExecStart=/home/sargedas/work/appmodules/simplewebapp/scripts/auto_suspend.py
+User=ec2-user
+
+WorkingDirectory=/var/www/appmodules
+ExecStart=/var/www/appmodules/app-env/bin/python /var/www/appmodules/simplewebapp/scripts/auto_suspend.py
 
 [Install]
 WantedBy=multi-user.target
+
