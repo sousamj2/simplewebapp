@@ -172,7 +172,7 @@ def update_stats():
     remote_tmp = f"/tmp/usecache_db_{ign}.txt"
     
     cmd = [
-        "ssh", "-o", "StrictHostKeyChecking=no", f"{mc_user}@{mc_host}",
+        "ssh", "-6", "-o", "StrictHostKeyChecking=no", f"{mc_user}@{mc_host}",
         f"python3 {script_path} {stats_dir} --server-root /home/minecraft --user {ign} --with-rank --export-db {remote_tmp}"
     ]
     
@@ -186,7 +186,7 @@ def update_stats():
             local_tmp = tmp_file.name
             
         scp_cmd = [
-            "scp", "-o", "StrictHostKeyChecking=no",
+            "scp", "-6", "-o", "StrictHostKeyChecking=no",
             f"{mc_user}@{mc_host}:{remote_tmp}", local_tmp
         ]
         print(f"DEBUG: Running SCP command: {' '.join(scp_cmd)}", flush=True)
