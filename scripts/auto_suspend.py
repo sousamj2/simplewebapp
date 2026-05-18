@@ -88,7 +88,25 @@ def update_db_before_suspend():
                 
                 email = getEmailFromIgn(ign)
                 if not email:
-                    continue
+                    # Create a placeholder user
+                    import random
+                    import string
+                    from mysql.DBhelpers import insertNewUser
+                    
+                    rand_str = ''.join(random.choices(string.ascii_letters + string.digits, k=30))
+                    placeholder_email = f"{rand_str}@placeholder.local"
+                    
+                    # Insert placeholder with g_token_override=-1, account_validated=True (they are on the server)
+                    insertNewUser(
+                        first="Placeholder",
+                        last="User",
+                        email=placeholder_email,
+                        ign=ign,
+                        account_validated=True,
+                        g_token_override=-1
+                    )
+                    email = placeholder_email
+                    print(f"DEBUG AUTO-SUSPEND: Created placeholder account for {ign}")
                 
                 update_mc_stats(
                     email,
