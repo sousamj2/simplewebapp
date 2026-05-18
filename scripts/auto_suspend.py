@@ -54,6 +54,11 @@ def update_db_before_suspend():
             print("DEBUG AUTO-SUSPEND: No output received from DB sync. Skipped.")
             return
 
+        # Add simplewebapp directory to sys.path so app.py can find 'blueprints' module
+        simplewebapp_dir = os.path.join(app_root, 'simplewebapp')
+        if simplewebapp_dir not in sys.path:
+            sys.path.insert(0, simplewebapp_dir)
+            
         from simplewebapp.app import create_app
         app = create_app()
         
