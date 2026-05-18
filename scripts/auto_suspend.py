@@ -108,13 +108,19 @@ def update_db_before_suspend():
                     email = placeholder_email
                     print(f"DEBUG AUTO-SUSPEND: Created placeholder account for {ign}")
                 
+                
+                last_online = data.get('last_online')
+                if last_online and '-' not in last_online:
+                    # Player is online or just left (e.g. "3 seconds."); use current time
+                    last_online = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                
                 update_mc_stats(
                     email,
                     data.get('uuid', 'NA'),
                     data.get('rank', 'NR'),
                     data.get('bank', '0.0'), 
                     data.get('claims', 'NA'), 
-                    data.get('last_online'),
+                    last_online,
                     data.get('first_login'),
                     data.get('location')
                 )

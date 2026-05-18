@@ -210,13 +210,17 @@ def update_stats():
             for line in f:
                 print(f"DEBUG: Read line from SCP file: {line.strip()}", flush=True)
                 data = json.loads(line.strip())
+                last_online = data.get("last_online")
+                if last_online and '-' not in last_online:
+                    last_online = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    
                 res = update_mc_stats(
                     email,
                     data.get("uuid", "NA"),
                     data.get("rank", "NA"),
                     data.get("bank", "0.0"),
                     data.get("claims", "NA"),
-                    data.get("last_online"),
+                    last_online,
                     data.get("first_login"),
                     data.get("location")
                 )
