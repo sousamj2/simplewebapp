@@ -2,6 +2,36 @@
     <img src="{{ url_for('static', filename='images/mjcrafts_banner_profile.png') }}" alt="MJCRAFTS" class="profile-banner">
 </div>
 
+{% if show_validation_popup %}
+<!-- Account Validation Popup Modal -->
+<div id="validationModal" class="modal-overlay" style="display:flex;">
+    <div class="modal-box card">
+        <div style="text-align: center; margin-bottom: 16px;">
+            <span style="font-size: 2.5rem;">⚠️</span>
+        </div>
+        <h2 style="text-align: center; margin-bottom: 12px;">Account Validation Required</h2>
+        <p style="text-align: center; line-height: 1.6;">
+            Your account has been created, but we could not verify your In-Game Name on the Minecraft server
+            (it may be offline).
+        </p>
+        <p style="text-align: center; line-height: 1.6;">
+            <strong>Please join the Minecraft server within 20 minutes</strong> to validate your registration.
+            If you don't, your account will be automatically removed.
+        </p>
+        <div style="display: flex; gap: 12px; justify-content: center; margin-top: 20px; flex-wrap: wrap;">
+            <button class="btn btn--primary" onclick="document.getElementById('validationModal').style.display='none';">
+                I confirm
+            </button>
+            <a href="{{ url_for('home.home') }}" class="btn btn--secondary" style="text-decoration: none; text-align: center;">
+                I will do it later
+            </a>
+        </div>
+    </div>
+</div>
+{% elif account_validated is defined and account_validated %}
+    {# Show a subtle rank update message for freshly validated accounts #}
+{% endif %}
+
 <div class="profile-container">
     <!-- Top welcome block with Avatar -->
     <div class="welcome-block card profile-header">

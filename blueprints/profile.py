@@ -15,7 +15,7 @@ import subprocess
 import json
 import tempfile
 import os
-from mysql.DBhelpers import get_user_profile_tier1, update_mc_stats
+from mysql.DBhelpers import get_user_profile_tier1, update_mc_stats, submit_query
 from simplewebapp.Funhelpers import get_lisbon_greeting
 from datetime import datetime
 import time as _time
@@ -72,11 +72,15 @@ def profile():
         last_online_display = "Unknown"
         
         # Default stats from DB
+        def get_stat(key):
+            val = session["metadata"].get(key)
+            return "NA" if val is None else val
+
         stats = {
-            "uuid": session["metadata"].get("mc_uuid") or "NA",
-            "rank": session["metadata"].get("mc_rank") or "NA",
-            "bank": session["metadata"].get("mc_bank") or "NA",
-            "claims": session["metadata"].get("mc_claims") or "NA",
+            "uuid": get_stat("mc_uuid"),
+            "rank": get_stat("mc_rank"),
+            "bank": get_stat("mc_bank"),
+            "claims": get_stat("mc_claims"),
         }
         
         last_online_dt = session["metadata"].get("mc_last_online")
@@ -122,6 +126,11 @@ def profile():
                     session.pop("resume_in_progress", None)
         # -----------------------------
         print(f"⏱️  PROFILE [TOTAL]: {_time.monotonic()-_t0:.2f}s", flush=True)
+        # Determine account validation state
+        account_validated = bool(session["metadata"].get("account_validated"))
+        show_validation_popup = bool(session["metadata"].pop("show_validation_popup", False))
+        session.modified = True
+
         return render_template(
             "index.html",
             admin_email=current_app.config["ADMIN_EMAIL"],
@@ -143,6 +152,8 @@ def profile():
             player_location=session["metadata"].get("mc_location", "NA"),
             player_first_login=format_data(session["metadata"].get("mc_first_login", "")),
             player_uuid=stats.get("uuid", "NA"),
+            account_validated=account_validated,
+            show_validation_popup=show_validation_popup,
         )
 
     else:
@@ -216,6 +227,10 @@ def update_stats():
         os.remove(local_tmp)
         
         if updated:
+            # Mark account as validated since we found the IGN on the server
+            submit_query("UPDATE users SET account_validated = TRUE WHERE email = %s;", (email,))
+            print(f"DEBUG: account_validated set to TRUE for {email}", flush=True)
+
             # Re-fetch the user data to update the session
             user_data = get_user_profile_tier1(email)
             if user_data:
