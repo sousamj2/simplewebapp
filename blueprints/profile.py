@@ -149,11 +149,14 @@ def profile():
         return redirect(url_for("signin.signin"))
 @bp_profile.route("/update_stats", methods=["POST"])
 def update_stats():
+    print("DEBUG: update_stats called", flush=True)
     if not session.get("metadata"):
+        print("DEBUG: No session metadata found!", flush=True)
         return redirect(url_for("signin.signin"))
         
     ign = session["metadata"].get("ign")
     email = session["metadata"].get("email")
+    print(f"DEBUG: ign={ign}, email={email}", flush=True)
     if not ign:
         flash("No Minecraft username linked to this account.")
         return redirect(url_for("profile.profile"))
@@ -161,6 +164,7 @@ def update_stats():
     # Connect to MC server and run the script
     mc_user = current_app.config.get("MC_SERVER_USER", "goals_locust8006_eagereverest_co")
     mc_host = current_app.config.get("MC_SERVER_HOST", "2600:1900:4010:58a::")
+    print(f"DEBUG: Connecting to {mc_user}@{mc_host}", flush=True)
     
     # Common paths for the MC server
     script_path = "/home/sargedas/mcserver/ingame_scripts/travel_time_report.py"
@@ -173,7 +177,9 @@ def update_stats():
     ]
     
     try:
+        print(f"DEBUG: Running command: {' '.join(cmd)}", flush=True)
         subprocess.run(cmd, check=True, capture_output=True, timeout=30)
+        print("DEBUG: SSH command succeeded", flush=True)
         
         # SCP it back
         with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
@@ -183,21 +189,27 @@ def update_stats():
             "scp", "-o", "StrictHostKeyChecking=no",
             f"{mc_user}@{mc_host}:{remote_tmp}", local_tmp
         ]
+        print(f"DEBUG: Running SCP command: {' '.join(scp_cmd)}", flush=True)
         subprocess.run(scp_cmd, check=True, timeout=10)
+        print(f"DEBUG: SCP succeeded. local_tmp={local_tmp}", flush=True)
         
         # Read the file and update DB
         updated = False
         with open(local_tmp, "r", encoding="utf-8") as f:
             for line in f:
+                print(f"DEBUG: Read line from SCP file: {line.strip()}", flush=True)
                 data = json.loads(line.strip())
-                update_mc_stats(
+                res = update_mc_stats(
                     email,
                     data.get("uuid", "NA"),
                     data.get("rank", "NA"),
                     data.get("bank", "0.0"),
                     data.get("claims", "NA"),
-                    data.get("last_online")
+                    data.get("last_online"),
+                    data.get("first_login"),
+                    data.get("location")
                 )
+                print(f"DEBUG: update_mc_stats result: {res}", flush=True)
                 updated = True
                 break # Only one line expected for --user <ign>
                 
@@ -211,13 +223,18 @@ def update_stats():
                 user_data["mc_status"] = session["metadata"].get("mc_status", {})
                 user_data["greeting"] = session["metadata"].get("greeting", "")
                 session["metadata"] = user_data
+                print(f"DEBUG: Session metadata updated successfully. location={user_data.get('mc_location')}", flush=True)
             flash("Minecraft stats updated successfully!", "success")
         else:
+            print("DEBUG: No line was read from SCP file, updated=False", flush=True)
             flash("Failed to retrieve updated stats from the server.", "danger")
             
     except subprocess.CalledProcessError as e:
-        flash(f"Failed to update stats from server: {e.stderr.decode('utf-8') if e.stderr else 'timeout or ssh error'}", "danger")
+        err_msg = e.stderr.decode('utf-8') if e.stderr else 'timeout or ssh error'
+        print(f"DEBUG: subprocess.CalledProcessError: {err_msg}", flush=True)
+        flash(f"Failed to update stats from server: {err_msg}", "danger")
     except Exception as e:
+        print(f"DEBUG: Exception: {str(e)}", flush=True)
         flash(f"An error occurred: {str(e)}", "danger")
         
     return redirect(url_for("profile.profile"))
