@@ -28,13 +28,66 @@ ZONE = "europe-west1-b"
 PROJECT_ID = "minecraft-server-july-12"
 IDLE_THRESHOLD_MINUTES = 10
 
-def run_cmd(cmd):
+def run_cmd(cmd, timeout=60):
     try:
-        result = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=60)
+        result = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=timeout)
         return result.stdout.strip()
     except Exception as e:
         print(f"DEBUG AUTO-SUSPEND: Error running command: {e}")
         return ""
+
+def update_db_before_suspend():
+    print("DEBUG AUTO-SUSPEND: Synchronizing Minecraft stats to local DB before suspend...")
+    try:
+        from mysql.DBhelpers import update_mc_stats, getEmailFromIgn
+        import json
+        
+        # Run travel_time_report to get fresh stats for all players, output to a temp file, then read it
+        remote_script = "/home/sargedas/mcserver/ingame_scripts/travel_time_report.py"
+        remote_stats = "/home/minecraft/world/players/stats"
+        remote_cmd = f"python3 {remote_script} {remote_stats} --server-root /home/minecraft --with-rank --export-db /tmp/full_db_cache.txt && cat /tmp/full_db_cache.txt"
+        
+        cmd = f"gcloud compute ssh {INSTANCE_NAME} --zone {ZONE} --project {PROJECT_ID} --quiet -- \"{remote_cmd}\""
+        output = run_cmd(cmd, timeout=45)
+        
+        if not output:
+            print("DEBUG AUTO-SUSPEND: No output received from DB sync. Skipped.")
+            return
+
+        updated_count = 0
+        for line in output.splitlines():
+            line = line.strip()
+            if not line or not line.startswith('{'):
+                continue
+            
+            try:
+                data = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+                
+            ign = data.get('player')
+            if not ign:
+                continue
+            
+            email = getEmailFromIgn(ign)
+            if not email:
+                continue
+            
+            update_mc_stats(
+                email,
+                data.get('uuid', 'NA'),
+                data.get('rank', 'NR'),
+                data.get('bank', '0.0'), 
+                data.get('claims', 'NA'), 
+                data.get('last_online'),
+                data.get('first_login'),
+                data.get('location')
+            )
+            updated_count += 1
+            
+        print(f"DEBUG AUTO-SUSPEND: Successfully updated stats for {updated_count} player(s) in local DB.")
+    except Exception as e:
+        print(f"DEBUG AUTO-SUSPEND: Failed to update DB: {e}")
 
 def check_and_suspend():
     print(f"DEBUG AUTO-SUSPEND: [{datetime.now()}] Checking server status...")
@@ -106,13 +159,16 @@ def check_and_suspend():
     # Suspend!
     print("DEBUG AUTO-SUSPEND: IDLE THRESHOLD EXCEEDED. Suspending instance...")
     
+    # 0. Update Database
+    update_db_before_suspend()
+    
     # 1. Stop the monitoring timer so it doesn't fire while VM is starting later
     print("DEBUG AUTO-SUSPEND: Stopping auto-suspend timer...")
     run_cmd("sudo systemctl stop mc_auto_suspend.timer")
     
     # 2. Suspend the instance
     suspend_cmd = f"gcloud compute instances suspend {INSTANCE_NAME} --zone {ZONE} --project {PROJECT_ID} --quiet"
-    run_cmd(suspend_cmd)
+    run_cmd(suspend_cmd, timeout=180)
     print("DEBUG AUTO-SUSPEND: Suspend command issued.")
 
 if __name__ == "__main__":
