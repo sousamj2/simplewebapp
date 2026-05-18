@@ -33,11 +33,26 @@ if [[ "${APP_ENV}" == "dev" ]]; then
         # Wait for MariaDB to be ready
         echo -e "${YELLOW}⏳ Waiting for MariaDB to be ready...${NC}"
         for i in {1..30}; do
-            # Use pymysql to do a real connection check, as 'nc' succeeds too early due to docker-proxy
-            if $VENV_PATH/bin/python -c "import pymysql, os; pymysql.connect(host=os.getenv('MYSQL_HOST', '127.0.0.1'), port=int(os.getenv('MYSQL_PORT', 3307)), user=os.getenv('MYSQL_USER'), password=os.getenv('MYSQL_PASSWORD'))" 2>/dev/null; then
+            # Use pymysql to do a real connection check.
+            # If we get Access Denied (1045), the server is alive and ready, so we count it as a success!
+            if $VENV_PATH/bin/python -c "
+import pymysql, sys, os
+try:
+    pymysql.connect(
+        host='127.0.0.1',
+        port=3307,
+        user=os.getenv('MYSQL_USER', 'dummy'),
+        password=os.getenv('MYSQL_PASSWORD', 'dummy')
+    )
+except pymysql.err.OperationalError as e:
+    if e.args[0] == 1045: sys.exit(0)
+    sys.exit(1)
+except Exception:
+    sys.exit(1)
+" 2>/dev/null; then
                 break
             fi
-            echo -n "."
+            echo -n "$i."
             sleep 1
         done
         echo ""
