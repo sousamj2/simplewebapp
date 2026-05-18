@@ -80,6 +80,19 @@
                 <span class="stat-label">Claims:</span>
                 <span class="stat-value">{{ player_claims }}</span>
             </div>
+            <div class="stat-item">
+                <span class="stat-label">Location:</span>
+                <span class="stat-value">{{ player_location }}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">First Login:</span>
+                <span class="stat-value">{{ player_first_login }}</span>
+            </div>
+        </div>
+        <div class="stats-actions" style="margin-top: 15px; text-align: center;">
+            <form action="{{ url_for('profile.update_stats') }}" method="POST">
+                <button type="submit" class="btn btn--secondary">Update Stats</button>
+            </form>
         </div>
     </div>
 

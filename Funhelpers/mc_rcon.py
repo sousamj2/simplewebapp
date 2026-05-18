@@ -2,6 +2,7 @@ import socket
 import struct
 import re
 from flask import current_app
+import time as _time
 
 def strip_mc_codes(text):
     """
@@ -32,7 +33,9 @@ def run_rcon_command(command):
         
     try:
         # Create connection (handles both IPv4 and IPv6 automatically)
+        _tc = _time.monotonic()
         sock = socket.create_connection((host, port), timeout=5)
+        print(f"⏱️  RCON [connect {host}:{port}]: {_time.monotonic()-_tc:.2f}s", flush=True)
         
         def send_packet(packet_type, payload):
             # Packet structure: Length (4) | Request ID (4) | Type (4) | Payload (N) | 2 null bytes (2)
@@ -97,7 +100,9 @@ def get_player_stats(player_name):
     raw_stats = {}
     for key, placeholder in placeholders.items():
         cmd = f"papi parse {player_name} {placeholder}"
+        _tr = _time.monotonic()
         res = run_rcon_command(cmd)
+        print(f"⏱️  RCON [papi {key}]: {_time.monotonic()-_tr:.2f}s", flush=True)
         if res and "Error" not in res and res.strip() != placeholder:
             raw_stats[key] = res.strip()
         else:

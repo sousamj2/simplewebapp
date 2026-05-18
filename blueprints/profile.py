@@ -11,9 +11,14 @@ from flask import (
 from markupsafe import Markup
 from math import ceil
 
+import subprocess
+import json
+import tempfile
+import os
 from mysql.DBhelpers import get_user_profile_tier1, update_mc_stats
 from simplewebapp.Funhelpers import get_lisbon_greeting
 from datetime import datetime
+import time as _time
 
 bp_profile = Blueprint("profile", __name__, url_prefix="/profile")
 
@@ -30,6 +35,7 @@ def profile():
     """
     Renders the user's profile page.
     """
+    _t0 = _time.monotonic()
     email = None
     mypict = ""
 
@@ -43,7 +49,9 @@ def profile():
 
     if email:
         # Refresh profile from DB
+        _t1 = _time.monotonic()
         db_profile = get_user_profile_tier1(email)
+        print(f"⏱️  PROFILE [get_user_profile_tier1]: {_time.monotonic()-_t1:.2f}s", flush=True)
         if db_profile:
             session["metadata"].update(db_profile)
 
@@ -54,10 +62,11 @@ def profile():
         session["metadata"]["greeting"] = get_lisbon_greeting()
 
         # Fetch Minecraft stats
-        from simplewebapp.Funhelpers.mc_rcon import get_player_stats
         from simplewebapp.Funhelpers.mc_server_status import get_mc_status
         
+        _t2 = _time.monotonic()
         mc_status = get_mc_status()
+        print(f"⏱️  PROFILE [get_mc_status]: {_time.monotonic()-_t2:.2f}s (online={mc_status.get('online')})", flush=True)
         ign = session["metadata"].get("ign")
         stats = {}
         last_online_display = "Unknown"
@@ -74,41 +83,15 @@ def profile():
         if last_online_dt:
             last_online_display = format_data(last_online_dt)
 
-        if ign and (mc_status.get("online") or True): # Try RCON if server might be online
-            rcon_stats = get_player_stats(ign)
-            if rcon_stats and rcon_stats.get("uuid") != "NA":
-                stats = rcon_stats
-                # Update last online if RCON says they are online
-                current_time = datetime.now()
-                
-                if stats.get("is_online"):
-                    last_online_display = "Now"
-                    last_online_val = current_time
-                    
-                    # Sync stats to DB ONLY while online to preserve them when offline
-                    update_mc_stats(
-                        email, 
-                        stats["uuid"], 
-                        stats["rank"], 
-                        stats["bank"], 
-                        stats["claims"], 
-                        last_online_val
-                    )
-                else:
-                    # Player is offline. Use values from the database (already in session metadata)
-                    stats["rank"] = session["metadata"].get("mc_rank") or "NA"
-                    stats["bank"] = session["metadata"].get("mc_bank") or "0.0"
-                    stats["claims"] = session["metadata"].get("mc_claims") or "NA"
-                    
-                    # If RCON returned an 'ago' string from /seen, use it for display
-                    if "ago" in str(stats.get("last_online", "")):
-                        last_online_display = stats["last_online"]
-                    
-                    # Keep the timestamp value we loaded from the DB earlier
-                    last_online_val = last_online_dt
-            else:
-                # If RCON failed, keep the DB value
-                last_online_val = last_online_dt
+        # Determine if online (heuristic based on last online timestamp vs current time, or just use server list players if available)
+        is_online = False
+        if mc_status.get("online") and ign:
+            # simplewebapp's mc_server_status might return players_list
+            players = mc_status.get("players_list", [])
+            is_online = ign in players
+
+        if is_online:
+            last_online_display = "Now"
         
         # Merge mc_status into metadata for the template
         session["metadata"]["mc_status"] = mc_status
@@ -138,6 +121,7 @@ def profile():
                     # Task is finished, failed or lost. Clear flag to show Start button again.
                     session.pop("resume_in_progress", None)
         # -----------------------------
+        print(f"⏱️  PROFILE [TOTAL]: {_time.monotonic()-_t0:.2f}s", flush=True)
         return render_template(
             "index.html",
             admin_email=current_app.config["ADMIN_EMAIL"],
@@ -156,8 +140,84 @@ def profile():
             player_rank=stats.get("rank", "NA"),
             player_bank=stats.get("bank", "NA"),
             player_claims=stats.get("claims", "NA"),
+            player_location=session["metadata"].get("mc_location", "NA"),
+            player_first_login=format_data(session["metadata"].get("mc_first_login", "")),
             player_uuid=stats.get("uuid", "NA"),
         )
 
     else:
         return redirect(url_for("signin.signin"))
+@bp_profile.route("/update_stats", methods=["POST"])
+def update_stats():
+    if not session.get("metadata"):
+        return redirect(url_for("signin.signin"))
+        
+    ign = session["metadata"].get("ign")
+    email = session["metadata"].get("email")
+    if not ign:
+        flash("No Minecraft username linked to this account.")
+        return redirect(url_for("profile.profile"))
+
+    # Connect to MC server and run the script
+    mc_user = current_app.config.get("MC_SERVER_USER", "goals_locust8006_eagereverest_co")
+    mc_host = current_app.config.get("MC_SERVER_HOST", "2600:1900:4010:58a::")
+    
+    # Common paths for the MC server
+    script_path = "/home/minecraft/server/ingame_scripts/travel_time_report.py"
+    stats_dir = "/home/minecraft/server/world/players/stats"
+    remote_tmp = f"/tmp/usecache_db_{ign}.txt"
+    
+    cmd = [
+        "ssh", "-o", "StrictHostKeyChecking=no", f"{mc_user}@{mc_host}",
+        f"python3 {script_path} {stats_dir} --user {ign} --with-rank --export-db {remote_tmp}"
+    ]
+    
+    try:
+        subprocess.run(cmd, check=True, capture_output=True, timeout=30)
+        
+        # SCP it back
+        with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
+            local_tmp = tmp_file.name
+            
+        scp_cmd = [
+            "scp", "-o", "StrictHostKeyChecking=no",
+            f"{mc_user}@{mc_host}:{remote_tmp}", local_tmp
+        ]
+        subprocess.run(scp_cmd, check=True, timeout=10)
+        
+        # Read the file and update DB
+        updated = False
+        with open(local_tmp, "r", encoding="utf-8") as f:
+            for line in f:
+                data = json.loads(line.strip())
+                update_mc_stats(
+                    email,
+                    data.get("uuid", "NA"),
+                    data.get("rank", "NA"),
+                    data.get("bank", "0.0"),
+                    data.get("claims", "NA"),
+                    data.get("last_online")
+                )
+                updated = True
+                break # Only one line expected for --user <ign>
+                
+        os.remove(local_tmp)
+        
+        if updated:
+            # Re-fetch the user data to update the session
+            user_data = get_user_profile_tier1(email)
+            if user_data:
+                # Merge mc_status to preserve it
+                user_data["mc_status"] = session["metadata"].get("mc_status", {})
+                user_data["greeting"] = session["metadata"].get("greeting", "")
+                session["metadata"] = user_data
+            flash("Minecraft stats updated successfully!", "success")
+        else:
+            flash("Failed to retrieve updated stats from the server.", "danger")
+            
+    except subprocess.CalledProcessError as e:
+        flash(f"Failed to update stats from server: {e.stderr.decode('utf-8') if e.stderr else 'timeout or ssh error'}", "danger")
+    except Exception as e:
+        flash(f"An error occurred: {str(e)}", "danger")
+        
+    return redirect(url_for("profile.profile"))
