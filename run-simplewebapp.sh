@@ -26,7 +26,7 @@ fi
 # 4. Wait for the MariaDB to be ready
 for i in {1..30}; do
     # Use pymysql to do a real connection check, as 'nc' succeeds too early due to docker-proxy
-    if ../app-env/bin/python -c "import pymysql, os; pymysql.connect(host=os.getenv('MYSQL_HOST', '127.0.0.1'), port=int(os.getenv('MYSQL_PORT', 3307)), user=os.getenv('MYSQL_USER'), password=os.getenv('MYSQL_PASSWORD'))" 2>/dev/null; then
+    if $VENV_PATH/bin/python -c "import pymysql, os; pymysql.connect(host=os.getenv('MYSQL_HOST', '127.0.0.1'), port=int(os.getenv('MYSQL_PORT', 3307)), user=os.getenv('MYSQL_USER'), password=os.getenv('MYSQL_PASSWORD'))" 2>/dev/null; then
          break
     fi
     sleep 1

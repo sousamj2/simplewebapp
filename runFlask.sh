@@ -11,6 +11,7 @@ NC='\033[0m' # No Color
 
 # Set environment
 export APP_ENV=dev # Enable SSM loading
+VENV_PATH=$(realpath ../app-env)
 
 # Fetch credentials from GCP early so table creation works
 if [[ "${APP_ENV}" == "dev" ]]; then
@@ -33,7 +34,7 @@ if [[ "${APP_ENV}" == "dev" ]]; then
         echo -e "${YELLOW}⏳ Waiting for MariaDB to be ready...${NC}"
         for i in {1..30}; do
             # Use pymysql to do a real connection check, as 'nc' succeeds too early due to docker-proxy
-            if ../app-env/bin/python -c "import pymysql, os; pymysql.connect(host=os.getenv('MYSQL_HOST', '127.0.0.1'), port=int(os.getenv('MYSQL_PORT', 3307)), user=os.getenv('MYSQL_USER'), password=os.getenv('MYSQL_PASSWORD'))" 2>/dev/null; then
+            if $VENV_PATH/bin/python -c "import pymysql, os; pymysql.connect(host=os.getenv('MYSQL_HOST', '127.0.0.1'), port=int(os.getenv('MYSQL_PORT', 3307)), user=os.getenv('MYSQL_USER'), password=os.getenv('MYSQL_PASSWORD'))" 2>/dev/null; then
                 break
             fi
             echo -n "."
@@ -48,7 +49,6 @@ fi
 echo -e "   🚀 Creating tables if they don't exist"
 
 # Get absolute path to the virtual environment
-VENV_PATH=$(realpath ../app-env)
 
 $VENV_PATH/bin/python -c "import os;\
 import sys;\

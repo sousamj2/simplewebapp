@@ -10,6 +10,7 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
+VENV_PATH=$(realpath ../app-env)
 
 echo -e "${YELLOW}🔐 Fetching configuration from GCP Secret Manager (PASS_CONFIG)...${NC}"
 
@@ -42,7 +43,7 @@ docker-compose -f ../docker-compose.yml up -d || docker compose -f ../docker-com
 echo -e "${YELLOW}⏳ Waiting for MariaDB to be ready...${NC}"
 for i in {1..30}; do
     # Use pymysql to do a real connection check, as 'nc' succeeds too early due to docker-proxy
-    if ../app-env/bin/python -c "import pymysql, os; pymysql.connect(host=os.getenv('MYSQL_HOST', '127.0.0.1'), port=int(os.getenv('MYSQL_PORT', 3307)), user=os.getenv('MYSQL_USER'), password=os.getenv('MYSQL_PASSWORD'))" 2>/dev/null; then
+    if $VENV_PATH/bin/python -c "import pymysql, os; pymysql.connect(host=os.getenv('MYSQL_HOST', '127.0.0.1'), port=int(os.getenv('MYSQL_PORT', 3307)), user=os.getenv('MYSQL_USER'), password=os.getenv('MYSQL_PASSWORD'))" 2>/dev/null; then
          break
     fi
     echo -n "."
