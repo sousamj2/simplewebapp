@@ -47,6 +47,7 @@ def create_app(config_name=None):
     limiter = Limiter(
         get_remote_address,
         app=app,
+        storage_uri="memory://",
         default_limits=["20 per minute"],
         default_limits_exempt_when=lambda: request.path.startswith('/static/') or request.method != 'GET'
     )

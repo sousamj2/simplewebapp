@@ -28,7 +28,7 @@ ZONE = "europe-west1-b"
 PROJECT_ID = "minecraft-server-july-12"
 IDLE_THRESHOLD_MINUTES = 10
 
-def run_cmd(cmd, timeout=60):
+def run_cmd(cmd, timeout=180):
     try:
         result = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=timeout)
         return result.stdout.strip()
@@ -48,7 +48,7 @@ def update_db_before_suspend():
         remote_cmd = f"python3 {remote_script} {remote_stats} --server-root /home/minecraft --with-rank --export-db /tmp/full_db_cache.txt && cat /tmp/full_db_cache.txt"
         
         cmd = f"gcloud compute ssh {INSTANCE_NAME} --zone {ZONE} --project {PROJECT_ID} --quiet -- \"{remote_cmd}\""
-        output = run_cmd(cmd, timeout=45)
+        output = run_cmd(cmd, timeout=180)
         
         if not output:
             print("DEBUG AUTO-SUSPEND: No output received from DB sync. Skipped.")
@@ -150,9 +150,9 @@ def check_and_suspend():
     # Players == 0, check last logout time
     print("DEBUG AUTO-SUSPEND: No players online. Checking last logout via journal...")
     
-    # Use journalctl as recommended by user
+    # Optimize journalctl for large journals: stream backwards (-r) and stop at the first match (grep -m 1)
     ssh_cmd = f"gcloud compute ssh {INSTANCE_NAME} --zone {ZONE} --project {PROJECT_ID} --quiet -- " \
-              f"\"sudo journalctl -u mcpserver.service --grep 'left the game' -n 1 --no-pager\""
+              f"\"sudo journalctl -u mcpserver.service -r --no-pager | grep -m 1 'left the game'\""
     
     output = run_cmd(ssh_cmd)
     
