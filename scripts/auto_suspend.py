@@ -26,7 +26,7 @@ except ImportError as e:
 INSTANCE_NAME = "mcserver-mem8"
 ZONE = "europe-west1-b"
 PROJECT_ID = "minecraft-server-july-12"
-IDLE_THRESHOLD_MINUTES = 10
+IDLE_THRESHOLD_MINUTES = 1
 
 def run_cmd(cmd, timeout=180):
     try:
