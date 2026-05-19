@@ -50,7 +50,7 @@ def update_db_before_suspend():
         # Run travel_time_report to get fresh stats for all players, output to a temp file, then read it
         remote_script = "/home/sargedas/mcserver/ingame_scripts/travel_time_report.py"
         remote_stats = "/home/minecraft/world/players/stats"
-        remote_cmd = f"sudo rm -f /tmp/full_db_cache.txt && sudo -u sargedas python3 {remote_script} {remote_stats} --server-root /home/minecraft --with-rank --export-db /tmp/full_db_cache.txt && sudo -u sargedas cat /tmp/full_db_cache.txt"
+        remote_cmd = f"sudo rm -f /tmp/full_db_cache.txt && sudo -i -u sargedas python3 {remote_script} {remote_stats} --server-root /home/minecraft --with-rank --export-db /tmp/full_db_cache.txt && sudo -i -u sargedas cat /tmp/full_db_cache.txt"
         
         cmd = f"gcloud compute ssh {INSTANCE_NAME} --zone {ZONE} --project {PROJECT_ID} --quiet -- \"{remote_cmd}\""
         output = run_cmd(cmd, timeout=180)
