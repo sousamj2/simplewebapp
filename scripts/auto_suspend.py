@@ -207,7 +207,12 @@ def check_and_suspend():
     # Suspend!
     print("DEBUG AUTO-SUSPEND: IDLE THRESHOLD EXCEEDED. Suspending instance...")
     
-    # 0. Update Database
+    # 0a. Archive cronjob logs
+    print("DEBUG AUTO-SUSPEND: Archiving cronjob logs...")
+    archive_cmd = f"gcloud compute ssh {INSTANCE_NAME} --zone {ZONE} --project {PROJECT_ID} --quiet -- \"sudo bash /home/sargedas/mcserver/ingame_scripts/archive_cronjobs.sh\""
+    run_cmd(archive_cmd, timeout=120)
+    
+    # 0b. Update Database
     update_db_before_suspend()
     
     # 1. Stop the monitoring timer so it doesn't fire while VM is starting later
