@@ -31,6 +31,11 @@ IDLE_THRESHOLD_MINUTES = 10
 def run_cmd(cmd, timeout=180):
     try:
         result = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=timeout)
+        if result.returncode != 0:
+            print(f"DEBUG AUTO-SUSPEND: Command failed with code {result.returncode}.")
+            print(f"DEBUG AUTO-SUSPEND: Command: {cmd}")
+            print(f"DEBUG AUTO-SUSPEND: stdout: {result.stdout.strip()}")
+            print(f"DEBUG AUTO-SUSPEND: stderr: {result.stderr.strip()}")
         return result.stdout.strip()
     except Exception as e:
         print(f"DEBUG AUTO-SUSPEND: Error running command: {e}")
