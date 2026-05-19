@@ -106,9 +106,19 @@
                 <span class="stat-label">Bank:</span>
                 <span class="stat-value">{{ player_bank }}€</span>
             </div>
-            <div class="stat-item">
+            <div class="stat-item" style="align-items: flex-start;">
                 <span class="stat-label">Claims:</span>
-                <span class="stat-value">{{ player_claims }}</span>
+                <span class="stat-value" style="text-align: right;">
+                    {% if player_claims and '|' in player_claims %}
+                        {% set claims_parts = player_claims.split('|') %}
+                        <p style="margin: 0;">Available/Total: {{ claims_parts[0] }}</p>
+                        {% for center in claims_parts[1:] %}
+                            <p style="margin: 2px 0;">({{ center }})</p>
+                        {% endfor %}
+                    {% else %}
+                        {{ player_claims }}
+                    {% endif %}
+                </span>
             </div>
             <div class="stat-item">
                 <span class="stat-label">Location:</span>
