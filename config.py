@@ -89,10 +89,10 @@ class Config:
 
     # Google Cloud Mail Relay
     GOOGLE_MAIL_RELAY_URL = _get("GOOGLE_MAIL_RELAY_URL", "https://mail-relay-783543567741.europe-southwest1.run.app")
-    MAILSYSTEM = _get("MAILSYSTEM", "GCP")
-    LOCAL_MAIL_RELAY_HOST = _get("LOCAL_MAIL_RELAY_HOST")  # EC2-1 IP (set on EC2-2 only)
-    LOCAL_MAIL_RELAY_KEY = _get("LOCAL_MAIL_RELAY_KEY", "/home/ec2-user/.ssh/ec2_internal")
-    LOCAL_MAIL_RELAY_USER = _get("LOCAL_MAIL_RELAY_USER", "ec2-user")
+    MAILSYSTEM = _get("MC_MAILSYSTEM") or _get("MAILSYSTEM", "GCP")
+    LOCAL_MAIL_RELAY_HOST = _get("MC_LOCAL_MAIL_RELAY_HOST") or _get("LOCAL_MAIL_RELAY_HOST")  # EC2-1 IP (set on EC2-2 only)
+    LOCAL_MAIL_RELAY_KEY = _get("MC_LOCAL_MAIL_RELAY_KEY") or _get("LOCAL_MAIL_RELAY_KEY", "/home/ec2-user/.ssh/ec2_internal")
+    LOCAL_MAIL_RELAY_USER = _get("MC_LOCAL_MAIL_RELAY_USER") or _get("LOCAL_MAIL_RELAY_USER", "ec2-user")
     SECURITY_PASSWORD_SALT = _get("SECURITY_PASSWORD_SALT")
 
     # Google Calendar service account
